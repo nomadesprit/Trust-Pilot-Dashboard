@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trustpilot Intelligence · IQ Option</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -30,13 +30,13 @@
   --shadow:     0 4px 24px rgba(0,0,0,0.4);
   --shadow-lg:  0 8px 48px rgba(0,0,0,0.6);
   --radius:     14px;
-  --font:       'DM Sans', sans-serif;
-  --mono:       'DM Mono', monospace;
-  --display:    'Syne', sans-serif;
+  --font:       'Outfit', sans-serif;
+  --mono:       'JetBrains Mono', monospace;
+  --display:    'Outfit', sans-serif;
 }
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
-body { font-family:var(--font); background:var(--bg); color:var(--text); font-size:13px; min-height:100vh; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); font-size:13.5px; min-height:100vh; -webkit-font-smoothing:antialiased; }
 
 /* ── LOADER ─────────────────────────────────────────────── */
 #loader {
@@ -45,7 +45,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   transition:opacity .5s;
 }
 #loader.hide { opacity:0; pointer-events:none; }
-.loader-logo { font-family:var(--display); font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--tp); margin-bottom:32px; }
+.loader-logo { font-family:var(--display); font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--tp); margin-bottom:32px; }
 .loader-ring { width:48px; height:48px; border-radius:50%; border:2px solid var(--border2); border-top-color:var(--tp); animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .loader-status { margin-top:20px; font-size:11px; color:var(--text3); font-family:var(--mono); }
@@ -58,7 +58,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   display:flex; align-items:center; gap:0; padding:0 32px; height:60px;
 }
 .topbar-logo {
-  font-family:var(--display); font-size:14px; font-weight:800; letter-spacing:-.2px;
+  font-family:var(--display); font-size:14px; font-weight:700; letter-spacing:.2px;
   display:flex; align-items:center; gap:10px; margin-right:32px; padding-right:28px;
   border-right:1px solid var(--border);
 }
@@ -103,7 +103,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 .section-hd::after { content:''; flex:1; height:1px; background:var(--border); }
 
 /* ── KPI GRID ────────────────────────────────────────────── */
-.kpi-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:8px; }
+.kpi-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:12px; margin-bottom:8px; }
 .kpi-card {
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   padding:20px 18px 16px; position:relative; overflow:hidden;
@@ -146,27 +146,14 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 .star-bar-count { font-size:10px; color:var(--text3); font-family:var(--mono); width:18px; text-align:right; flex-shrink:0; }
 
 /* ── RESPONSE TIME SECTION ───────────────────────────────── */
-.resp-grid { display:grid; grid-template-columns:1fr 1fr 1fr 2fr; gap:12px; }
-.resp-stat {
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   padding:20px 18px;
 }
-.resp-stat-val { font-family:var(--display); font-size:22px; font-weight:800; margin-bottom:4px; }
-.resp-stat-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); }
-.resp-stat-sub { font-size:10px; color:var(--text3); margin-top:6px; font-family:var(--mono); }
 
 /* Response time distribution chart */
-.resp-chart-card {
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   padding:20px 18px;
 }
-.resp-chart-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:14px; }
-.resp-dist { display:flex; flex-direction:column; gap:7px; }
-.resp-dist-row { display:flex; align-items:center; gap:10px; }
-.resp-dist-key { font-size:10px; color:var(--text2); width:80px; flex-shrink:0; font-family:var(--mono); }
-.resp-dist-bar { flex:1; background:var(--surface3); border-radius:2px; height:8px; }
-.resp-dist-fill { height:100%; border-radius:2px; background:var(--tp); transition:width .6s ease; }
-.resp-dist-val { font-size:10px; color:var(--text3); font-family:var(--mono); width:30px; text-align:right; flex-shrink:0; }
 
 /* ── CHARTS ROW ──────────────────────────────────────────── */
 .charts-row { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:12px; }
@@ -349,9 +336,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   <div class="section-hd" style="margin-top:0;"><div class="section-label">Overview</div></div>
   <div class="kpi-grid" id="kpi-grid"></div>
 
-  <!-- Response Time -->
-  <div class="section-hd"><div class="section-label">ORM Response Time</div></div>
-  <div class="resp-grid" id="resp-grid"></div>
+
 
   <!-- Charts Row -->
   <div class="section-hd"><div class="section-label">Breakdown</div></div>
@@ -378,7 +363,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
       <div id="topic-bars"></div>
     </div>
     <div class="matrix-card">
-      <div class="matrix-card-title">Topic × Star Rating Matrix — click any cell</div>
+      <div class="matrix-card-title">Topic × Language Matrix — colour = dominant sentiment · click any cell</div>
       <table class="matrix-table" id="topic-matrix"></table>
     </div>
   </div>
@@ -592,6 +577,15 @@ function renderKPIs(curr, prev, allData){
   const mix=curr.filter(r=>r.sentiment==='Mixed').length;
   const replied=curr.filter(r=>r.fixed).length;
   const replyRate=total>0?((replied/total)*100).toFixed(0):0;
+  // Avg response time for KPI card
+  const withResp=curr.filter(r=>r.responseTime!==null&&r.responseTime>=0);
+  const withRespCount=withResp.length;
+  const avgResp=withRespCount?(withResp.reduce((s,r)=>s+r.responseTime,0)/withRespCount):null;
+  const sortedResp=[...withResp.map(r=>r.responseTime)].sort((a,b)=>a-b);
+  const medResp=sortedResp.length?sortedResp[Math.floor(sortedResp.length/2)]:null;
+  const avgRespStr=fmtHours(avgResp);
+  const medRespStr=fmtHours(medResp);
+  const avgRespColor=avgResp===null?'var(--text3)':avgResp<24?'var(--tp)':avgResp<72?'var(--amber)':'var(--red)';
 
   // Star distribution for ring chart
   const starCounts=[1,2,3,4,5].map(s=>scoreR.filter(r=>r.stars===s).length);
@@ -667,63 +661,15 @@ function renderKPIs(curr, prev, allData){
       <div class="kpi-value" style="color:var(--blue)">${replied}</div>
       <div class="kpi-sub">${replyRate}% reply rate</div>
     </div>
-  `;
-}
-
-function renderResponseTime(curr){
-  const withResp=curr.filter(r=>r.responseTime!==null&&r.responseTime>=0);
-  if(!withResp.length){
-    document.getElementById('resp-grid').innerHTML='<div style="color:var(--text3);font-size:12px;padding:12px;">No response time data for this period.</div>';
-    return;
-  }
-  const times=withResp.map(r=>r.responseTime).sort((a,b)=>a-b);
-  const avg=times.reduce((s,t)=>s+t,0)/times.length;
-  const median=times[Math.floor(times.length/2)];
-  const fastest=times[0];
-  const slowest=times[times.length-1];
-
-  // Buckets for distribution
-  const buckets=[
-    {label:'<4h',  max:4},
-    {label:'4–24h',min:4,max:24},
-    {label:'1–3d', min:24,max:72},
-    {label:'3–7d', min:72,max:168},
-    {label:'>7d',  min:168},
-  ];
-  const bCounts=buckets.map(b=>{
-    return times.filter(t=>(b.min===undefined||t>=b.min)&&(b.max===undefined||t<b.max)).length;
-  });
-  const maxB=Math.max(...bCounts,1);
-
-  document.getElementById('resp-grid').innerHTML=`
-    <div class="resp-stat">
-      <div class="resp-stat-lbl">Avg Response</div>
-      <div class="resp-stat-val" style="color:${avg<24?'var(--tp)':avg<72?'var(--amber)':'var(--red)'}">${fmtHours(avg)}</div>
-      <div class="resp-stat-sub">${withResp.length} reviews with response</div>
-    </div>
-    <div class="resp-stat">
-      <div class="resp-stat-lbl">Median</div>
-      <div class="resp-stat-val">${fmtHours(median)}</div>
-      <div class="resp-stat-sub">50th percentile</div>
-    </div>
-    <div class="resp-stat">
-      <div class="resp-stat-lbl">Fastest → Slowest</div>
-      <div class="resp-stat-val" style="font-size:16px;">${fmtHours(fastest)} → ${fmtHours(slowest)}</div>
-      <div class="resp-stat-sub">range</div>
-    </div>
-    <div class="resp-chart-card">
-      <div class="resp-chart-lbl">Response Time Distribution</div>
-      <div class="resp-dist">
-        ${buckets.map((b,i)=>`
-          <div class="resp-dist-row">
-            <span class="resp-dist-key">${b.label}</span>
-            <div class="resp-dist-bar"><div class="resp-dist-fill" style="width:${(bCounts[i]/maxB*100).toFixed(0)}%"></div></div>
-            <span class="resp-dist-val">${bCounts[i]}</span>
-          </div>`).join('')}
-      </div>
+    <div class="kpi-card">
+      <div class="kpi-card-accent" style="background:${avgRespColor}"></div>
+      <div class="kpi-label">Avg Response Time</div>
+      <div class="kpi-value" style="font-size:22px;color:${avgRespColor}">${avgRespStr}</div>
+      <div class="kpi-sub">${medRespStr} median · ${withRespCount} reviews</div>
     </div>
   `;
 }
+
 
 function renderCharts(curr, allData){
   // Trend: use all data for context, highlight current month
@@ -773,23 +719,30 @@ function renderTopicBars(curr){
 
 function renderMatrix(curr){
   const topics=[...new Set(curr.map(r=>r.topic))].sort();
-  const stars=[1,2,3,4,5];
+  const langs=[...new Set(curr.map(r=>r.language))].sort();
+  const LANG_NAMES={'en':'EN','es':'ES','pt':'PT','fr':'FR','de':'DE','th':'TH','my':'MY'};
+  // Colour by sentiment majority for that cell
   const table=document.getElementById('topic-matrix');
   let html=`<thead><tr><th></th>`;
-  stars.forEach(s=>html+=`<th class="matrix-col-header" style="color:${STAR_COLORS[s]}">${'★'.repeat(s)}</th>`);
+  langs.forEach(l=>html+=`<th class="matrix-col-header">${LANG_NAMES[l]||l.toUpperCase()}</th>`);
   html+=`</tr></thead><tbody>`;
   topics.forEach(t=>{
     html+=`<tr><td class="matrix-row-label">${t}</td>`;
-    stars.forEach(s=>{
-      const matches=curr.filter(r=>r.topic===t&&r.stars===s);
+    langs.forEach(l=>{
+      const matches=curr.filter(r=>r.topic===t&&r.language===l);
       const cnt=matches.length;
       if(cnt===0){
         html+=`<td class="matrix-cell matrix-cell-zero">·</td>`;
       } else {
-        const opacity=0.15+(cnt/12)*0.7;
-        const col=s<=2?'255,71,87':s===3?'255,177,66':s===4?'123,237,159':'0,182,122';
-        html+=`<td class="matrix-cell" style="background:rgba(${col},${Math.min(opacity,0.85)});color:rgb(${col});"
-          onclick="openReviewModal('${t} · ${s}★', curr.filter(r=>r.topic==='${t}'&&r.stars===${s}))">${cnt}</td>`;
+        // Colour by dominant sentiment
+        const neg=matches.filter(r=>r.sentiment==='Negative').length;
+        const pos=matches.filter(r=>r.sentiment==='Positive').length;
+        const mix=matches.filter(r=>r.sentiment==='Mixed').length;
+        const dom=neg>=pos&&neg>=mix?'neg':pos>=mix?'pos':'mix';
+        const col=dom==='neg'?'255,71,87':dom==='pos'?'0,182,122':'255,177,66';
+        const opacity=0.12+(cnt/10)*0.65;
+        html+=`<td class="matrix-cell" style="background:rgba(${col},${Math.min(opacity,0.88)});color:rgb(${col});"
+          onclick="openReviewModal('${t} · ${(LANG_NAMES[l]||l.toUpperCase())}', curr.filter(r=>r.topic==='${t}'&&r.language==='${l}'))">${cnt}</td>`;
       }
     });
     html+=`</tr>`;
@@ -900,7 +853,6 @@ function updateDashboard(){
   window.curr=curr;
 
   renderKPIs(curr,prev,ALL_DATA);
-  renderResponseTime(curr);
   renderCharts(curr,ALL_DATA);
   renderTopicBars(curr);
   renderMatrix(curr);
