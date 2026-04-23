@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trustpilot Intel · Dashboard</title>
+<title>Trustpilot Intel · Specialized Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -16,67 +16,60 @@
       --radius:12px; --font:'Plus Jakarta Sans',sans-serif; --mono:'IBM Plex Mono',monospace;
     }
     body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;margin:0;min-height:100vh;}
-    .topbar{position:sticky;top:0;z-index:200;background:var(--tp-dark);display:flex;align-items:center;padding:0 28px;height:56px;color:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.1);}
+    .topbar{position:sticky;top:0;z-index:200;background:var(--tp-dark);display:flex;align-items:center;padding:0 28px;height:56px;color:#fff;}
     .tp-logo{font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;font-size:15px;}
     .tp-star{color:var(--tp-green);font-size:20px;}
-    .month-selector{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:6px 12px; color:#fff; font-family:var(--font); font-weight:600; cursor:pointer; outline:none;}
-    .container{max-width:1200px;margin:0 auto;padding:28px;}
+    .month-selector{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:6px 12px; color:#fff; font-family:var(--font); font-weight:600; cursor:pointer;}
+
+    .container{max-width:1400px;margin:0 auto;padding:28px;}
     .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
-    .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:transform 0.2s;position:relative;overflow:hidden;}
-    .kpi-card:hover{transform:translateY(-2px); border-color:var(--tp-green);}
+    .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
     .kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
-    .kpi-value{font-size:28px;font-weight:800;color:var(--blue-900);letter-spacing:-1px;}
-    .kpi-delta{font-size:11px;font-weight:700;font-family:var(--mono);padding:2px 6px;border-radius:4px; margin-top:8px; display:inline-block;}
-    .kpi-delta.up{background:#ECFDF5;color:#065F46;}
-    .kpi-delta.dn{background:#FFF1F1;color:#991B1B;}
+    .kpi-value{font-size:24px;font-weight:800;color:var(--blue-900);letter-spacing:-0.5px;}
+
+    .matrix-card{background:var(--surface); padding:24px; border-radius:var(--radius); border:1px solid var(--border); overflow-x:auto;}
+    .matrix-table{width:100%; border-collapse:separate; border-spacing:4px;}
+    .matrix-header{font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text3); padding:10px; text-align:center;}
+    .matrix-topic-label{font-weight:700; text-align:right; padding-right:15px; color:var(--blue-900); white-space:nowrap;}
+    .matrix-cell{border-radius:6px; padding:12px; text-align:center; font-family:var(--mono); font-weight:700; cursor:pointer; transition:transform 0.15s;}
+    .matrix-cell:hover{transform:scale(1.1); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
+    
     .overlay{display:none;position:fixed;inset:0;background:rgba(10,31,68,.7);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
     .overlay.open{display:flex;}
-    .modal{background:var(--surface);border-radius:16px;width:90%;max-width:700px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.2);}
+    .modal{background:var(--surface);border-radius:16px;width:90%;max-width:700px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
     .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-    .modal-title{font-size:16px;font-weight:800;color:var(--blue-900);}
-    .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);}
     .modal-body{padding:20px;overflow-y:auto;background:var(--surface2);}
-    .drill-card{background:#fff; border:1px solid var(--border); padding:16px; border-radius:10px; margin-bottom:12px;}
-    .drill-stars{color:var(--tp-green); margin-bottom:8px; font-size:14px;}
-    .drill-text{line-height:1.6; margin-bottom:12px; font-style:italic;}
-    .drill-meta{font-size:11px; color:var(--text3); display:flex; justify-content:space-between; align-items:center;}
-    .btn-link{text-decoration:none; color:var(--tp-green); font-weight:700; border:1px solid var(--tp-green); padding:4px 10px; border-radius:6px; transition:0.2s;}
-    .btn-link:hover{background:var(--tp-green); color:#fff;}
-    .grid-2{display:grid;grid-template-columns: 1fr 1fr; gap:16px;}
-    .card{background:var(--surface);padding:24px;border-radius:var(--radius);border:1px solid var(--border);}
-    #loader-overlay{position:fixed; inset:0; background:var(--bg); z-index:999; display:flex; align-items:center; justify-content:center; font-weight:700; color:var(--blue-900);}
+    
+    /* DRILL CARD ENHANCEMENTS */
+    .drill-card{background:#fff; border:1px solid var(--border); padding:16px; border-radius:10px; margin-bottom:12px; position:relative;}
+    .score-badge{position:absolute; top:16px; right:16px; font-size:9px; font-weight:800; padding:3px 8px; border-radius:4px; text-transform:uppercase;}
+    .badge-counts{background:var(--tp-green); color:#fff;}
+    .badge-ignored{background:var(--surface2); color:var(--text3); border:1px solid var(--border);}
+    
+    .tag-reply{background:var(--tp-green); color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;}
 </style>
 </head>
 <body>
 
-<div id="loader-overlay">Fetching Data from Google Sheets...</div>
-
 <nav class="topbar">
-  <div class="tp-logo"><span class="tp-star">★</span> Trustpilot Performance</div>
-  <div style="margin-left:auto;">
-    <select id="month-select" class="month-selector" onchange="updateDashboard()"></select>
-  </div>
+  <div class="tp-logo"><span class="tp-star">★</span> Trustpilot Intelligence Dashboard</div>
+  <div style="margin-left:auto;"><select id="month-select" class="month-selector" onchange="updateDashboard()"></select></div>
 </nav>
 
 <div class="container">
   <div class="kpi-row" id="kpi-container"></div>
-  <div class="grid-2">
-    <div class="card">
-        <div class="kpi-label">Market Share (Language Proxy)</div>
-        <div style="height:250px;"><canvas id="langChart"></canvas></div>
-    </div>
-    <div class="card">
-        <div class="kpi-label">Top Performance Regions</div>
-        <div id="performance-breakdown" style="margin-top:10px;"></div>
-    </div>
+  
+  <div class="matrix-card">
+      <div class="kpi-label" style="margin-bottom:20px;">Topic x Market Review Matrix</div>
+      <table class="matrix-table" id="topic-matrix"></table>
   </div>
 </div>
 
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-header">
-      <div class="modal-title" id="modal-title">Reviews</div>
-      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modal-title" style="font-weight:800;">Reviews</div>
+      <button onclick="closeModal()" style="border:none; background:none; cursor:pointer; font-size:20px;">✕</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
@@ -88,14 +81,12 @@ const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?forma
 
 let ALL_DATA = [];
 let currentMonth = "";
-
 const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 function parseCSV(text) {
     const lines = text.split(/\r?\n/);
     return lines.map(line => {
-        const result = [];
-        let cur = '', inQuote = false;
+        const result = []; let cur = '', inQuote = false;
         for (let char of line) {
             if (char === '"') inQuote = !inQuote;
             else if (char === ',' && !inQuote) { result.push(cur); cur = ''; } 
@@ -106,158 +97,119 @@ function parseCSV(text) {
 }
 
 async function init() {
-    try {
-        const response = await fetch(CSV_URL);
-        const text = await response.text();
-        const rows = parseCSV(text);
+    const response = await fetch(CSV_URL);
+    const text = await response.text();
+    const rows = parseCSV(text);
+    
+    ALL_DATA = rows.slice(1).map(row => {
+        const dateStr = row[3] || "";
+        const d = new Date(dateStr);
+        const mKey = !isNaN(d.getTime()) ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : null;
         
-        ALL_DATA = rows.slice(1).map(row => {
-            const dateStr = row[3] || "";
-            const d = new Date(dateStr);
-            
-            // Robust ISO/Standard Date to MonthKey conversion
-            let mKey = null;
-            if (!isNaN(d.getTime())) {
-                mKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-            }
+        return {
+            link: row[0],
+            monthKey: mKey,
+            stars: parseInt(row[5]) || parseInt(row[4]) || 0,
+            content: row[7] || row[6] || "",
+            topic: row[12] || "Uncategorized",
+            market: (row[10] || "en").toLowerCase(),
+            replyStatus: row[8] ? row[8].trim().toLowerCase() : "",
+            countForScore: (row[15] || "").toUpperCase() === "TRUE"
+        };
+    }).filter(d => d.monthKey);
 
-            // Calculate Response Time on the fly
-            let respTime = null;
-            if (row[8] === "fixed" && row[9]) {
-                const rDate = new Date(row[9]);
-                if (!isNaN(rDate.getTime())) {
-                    respTime = Math.round(Math.abs(rDate - d) / 36e5); 
-                }
-            }
+    const monthKeys = [...new Set(ALL_DATA.map(d => d.monthKey))].sort().reverse();
+    const select = document.getElementById('month-select');
+    monthKeys.forEach(key => {
+        const [y, m] = key.split('-');
+        const opt = document.createElement('option');
+        opt.value = key; opt.text = `${MONTH_NAMES[parseInt(m)-1]} ${y}`;
+        select.appendChild(opt);
+    });
 
-            return {
-                link: row[0],
-                monthKey: mKey,
-                dateDisplay: !isNaN(d.getTime()) ? d.toLocaleDateString('en-GB') : "N/A",
-                stars: parseInt(row[4]) || 0,
-                content: row[6] || row[7] || "No content",
-                replyStatus: row[8] ? row[8].toLowerCase().trim() : "",
-                responseTime: respTime,
-                lang: row[10] || "Unknown"
-            };
-        }).filter(d => d.monthKey);
-
-        const monthKeys = [...new Set(ALL_DATA.map(d => d.monthKey))].sort().reverse();
-        const select = document.getElementById('month-select');
-        monthKeys.forEach(key => {
-            const [y, m] = key.split('-');
-            const opt = document.createElement('option');
-            opt.value = key;
-            opt.text = `${MONTH_NAMES[parseInt(m)-1]} ${y}`;
-            select.appendChild(opt);
-        });
-
-        currentMonth = monthKeys[0];
-        document.getElementById('loader-overlay').style.display = 'none';
-        updateDashboard();
-    } catch (err) {
-        document.getElementById('loader-overlay').innerHTML = "Error loading data. Ensure the Sheet is shared 'Anyone with link'.";
-    }
+    currentMonth = monthKeys[0];
+    updateDashboard();
 }
 
 function updateDashboard() {
     currentMonth = document.getElementById('month-select').value;
     const filtered = ALL_DATA.filter(d => d.monthKey === currentMonth);
-    
-    // Prev Month Delta Logic
-    let [y, m] = currentMonth.split('-').map(Number);
-    let prevKey = m === 1 ? `${y-1}-12` : `${y}-${String(m-1).padStart(2,'0')}`;
-    const prevData = ALL_DATA.filter(d => d.monthKey === prevKey);
-
-    renderKPIs(filtered, prevData);
-    renderLangChart(filtered);
+    renderKPIs(filtered);
+    renderMatrix(filtered);
 }
 
-function renderKPIs(curr, prev) {
-    const avg = curr.length ? (curr.reduce((s, r) => s + r.stars, 0) / curr.length).toFixed(1) : "0.0";
-    const prevAvg = prev.length ? (prev.reduce((s, r) => s + r.stars, 0) / prev.length).toFixed(1) : "0.0";
-    const diff = (parseFloat(avg) - parseFloat(prevAvg)).toFixed(1);
+function renderKPIs(data) {
+    // FILTER: Only account for reviews that count for score
+    const scoreReviews = data.filter(r => r.countForScore === true);
+    const avg = scoreReviews.length ? (scoreReviews.reduce((s, r) => s + r.stars, 0) / scoreReviews.length).toFixed(1) : "0.0";
+    
+    // Total Positive/Negative from ALL reviews (standard ORM view)
+    const pos = data.filter(r => r.stars >= 4).length;
+    const neg = data.filter(r => r.stars <= 2).length;
 
-    const responded = curr.filter(r => r.responseTime !== null);
-    const avgTime = responded.length ? (responded.reduce((s, r) => s + r.responseTime, 0) / responded.length).toFixed(0) : "—";
+    const topics = {};
+    data.forEach(r => topics[r.topic] = (topics[r.topic] || 0) + 1);
+    const mainTopic = Object.entries(topics).sort((a,b) => b[1] - a[1])[0]?.[0] || "None";
 
     document.getElementById('kpi-container').innerHTML = `
-        <div class="kpi-card" onclick="openDrill('All Reviews', 'all')">
-            <div class="kpi-label">TrustScore</div>
+        <div class="kpi-card">
+            <div class="kpi-label">Verified TrustScore</div>
             <div class="kpi-value">${avg} ★</div>
-            <span class="kpi-delta ${diff >= 0 ? 'up' : 'dn'}">${diff >= 0 ? '▲' : '▼'} ${Math.abs(diff)}</span>
+            <div style="font-size:9px; color:var(--text3); margin-top:5px;">Based on ${scoreReviews.length} verified reviews</div>
         </div>
-        <div class="kpi-card" onclick="openDrill('Positive Reviews', 'pos')">
-            <div class="kpi-label">Positive</div>
-            <div class="kpi-value" style="color:var(--tp-green)">${curr.filter(r=>r.stars>=4).length}</div>
-        </div>
-        <div class="kpi-card" onclick="openDrill('Negative Reviews', 'neg')">
-            <div class="kpi-label">Negative</div>
-            <div class="kpi-value" style="color:var(--negative)">${curr.filter(r=>r.stars<=2).length}</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">Avg Resp. Time</div>
-            <div class="kpi-value">${avgTime} <small style="font-size:12px">hrs</small></div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-label">Total Volume</div>
-            <div class="kpi-value">${curr.length}</div>
-        </div>
+        <div class="kpi-card"><div class="kpi-label">Positive</div><div class="kpi-value" style="color:var(--positive)">${pos}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Negative</div><div class="kpi-value" style="color:var(--negative)">${neg}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Main Topic</div><div class="kpi-value" style="font-size:16px;">${mainTopic}</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total Reviews</div><div class="kpi-value">${data.length}</div></div>
     `;
 }
 
-function openDrill(title, filterType) {
-    const filtered = ALL_DATA.filter(d => d.monthKey === currentMonth);
-    let list = [];
+function renderMatrix(data) {
+    const markets = [...new Set(data.map(r => r.market))].sort();
+    const topics = [...new Set(data.map(r => r.topic))].sort();
+    const table = document.getElementById('topic-matrix');
     
-    if(filterType === 'all') list = filtered;
-    else if(filterType === 'pos') list = filtered.filter(r => r.stars >= 4);
-    else if(filterType === 'neg') list = filtered.filter(r => r.stars <= 2);
-    else list = filtered.filter(r => r.lang.toLowerCase() === filterType.toLowerCase());
+    let html = `<thead><tr><th></th>`;
+    markets.forEach(m => html += `<th class="matrix-header">${m.toUpperCase()}</th>`);
+    html += `</tr></thead><tbody>`;
 
+    topics.forEach(t => {
+        html += `<tr><td class="matrix-topic-label">${t}</td>`;
+        markets.forEach(m => {
+            const count = data.filter(r => r.topic === t && r.market === m).length;
+            const opacity = count > 0 ? 0.1 + (count / 10) : 0;
+            const color = t.toLowerCase().includes('scam') || t.toLowerCase().includes('block') || t.toLowerCase().includes('withdraw') ? '220, 38, 38' : '0, 182, 122';
+            
+            html += `<td class="matrix-cell" style="background:rgba(${color}, ${opacity}); color:rgb(${color});" 
+                     onclick="openDrill('${t} in ${m.toUpperCase()}', '${t}', '${m}')">
+                     <span class="cell-val">${count || '-'}</span>
+                     </td>`;
+        });
+        html += `</tr>`;
+    });
+    table.innerHTML = html + `</tbody>`;
+}
+
+function openDrill(title, topic, market) {
+    const list = ALL_DATA.filter(r => r.monthKey === currentMonth && r.topic === topic && r.market === market);
     document.getElementById('modal-title').textContent = `${title} (${list.length})`;
-    const body = document.getElementById('modal-body');
-    body.innerHTML = list.map(r => `
+    document.getElementById('modal-body').innerHTML = list.map(r => `
         <div class="drill-card">
-            <div class="drill-stars">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
-            <div class="drill-text">"${r.content.substring(0, 300)}..."</div>
-            <div class="drill-meta">
-                <span>📅 ${r.dateDisplay} | Market: ${r.lang.toUpperCase()}</span>
-                <a href="${r.link}" target="_blank" class="btn-link">Trustpilot ↗</a>
+            <span class="score-badge ${r.countForScore ? 'badge-counts' : 'badge-ignored'}">
+                ${r.countForScore ? '✓ Counts for Score' : 'Muted / No Impact'}
+            </span>
+            <div style="color:var(--tp-green); margin-bottom:8px;">${'★'.repeat(r.stars)}</div>
+            <div style="font-style:italic; margin-bottom:10px; padding-right:100px;">"${r.content}"</div>
+            <div style="font-size:11px; color:var(--text3); display:flex; justify-content:space-between;">
+                <span>${r.replyStatus === 'fixed' ? '<b style="color:var(--tp-green)">✓ REPLIED</b>' : 'PENDING REPLY'}</span>
+                <a href="${r.link}" target="_blank" style="color:var(--tp-dark); font-weight:700;">View Review ↗</a>
             </div>
         </div>
-    `).join('') || "No reviews found.";
+    `).join('');
     document.getElementById('overlay').classList.add('open');
 }
 
 function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-
-function renderLangChart(data) {
-    const langs = {};
-    data.forEach(r => { langs[r.lang] = (langs[r.lang] || 0) + 1; });
-    const ctx = document.getElementById('langChart').getContext('2d');
-    if (window.myChart) window.myChart.destroy();
-    window.myChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: Object.keys(langs).map(l => l.toUpperCase()),
-            datasets: [{
-                data: Object.values(langs),
-                backgroundColor: ['#00b67a', '#191919', '#8A9BBC', '#E3E9F4', '#3B82F6']
-            }]
-        },
-        options: { 
-            responsive: true, maintainAspectRatio: false,
-            onClick: (evt, item) => {
-                if (item.length > 0) {
-                    const index = item[0].index;
-                    const label = window.myChart.data.labels[index];
-                    openDrill(`Market: ${label}`, label);
-                }
-            }
-        }
-    });
-}
 
 init();
 </script>
