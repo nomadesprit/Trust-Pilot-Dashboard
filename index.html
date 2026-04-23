@@ -3,215 +3,953 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trustpilot Intel · Specialized Dashboard</title>
+<title>Trustpilot Intelligence · IQ Option</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-    :root {
-      --bg:#F0F4FA; --surface:#FFFFFF; --surface2:#F7F9FC;
-      --border:#E3E9F4; --blue-900:#0A1F44; --text:#0A1F44; 
-      --text3:#8A9BBC; --tp-green:#00b67a; --tp-dark:#191919;
-      --positive:#059669; --negative:#DC2626; --neutral:#D97706;
-      --radius:12px; --font:'Plus Jakarta Sans',sans-serif; --mono:'IBM Plex Mono',monospace;
-    }
-    body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13px;margin:0;min-height:100vh;}
-    .topbar{position:sticky;top:0;z-index:200;background:var(--tp-dark);display:flex;align-items:center;padding:0 28px;height:56px;color:#fff;}
-    .tp-logo{font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;font-size:15px;}
-    .tp-star{color:var(--tp-green);font-size:20px;}
-    .month-selector{background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); border-radius:8px; padding:6px 12px; color:#fff; font-family:var(--font); font-weight:600; cursor:pointer;}
+:root {
+  --bg:         #0D0F14;
+  --surface:    #161820;
+  --surface2:   #1E2130;
+  --surface3:   #252840;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.13);
+  --text:       #F0F2FF;
+  --text2:      #9BA3C4;
+  --text3:      #5C6480;
+  --tp:         #00B67A;
+  --tp-dim:     rgba(0,182,122,0.12);
+  --tp-glow:    0 0 20px rgba(0,182,122,0.25);
+  --red:        #FF4757;
+  --red-dim:    rgba(255,71,87,0.12);
+  --amber:      #FFB142;
+  --amber-dim:  rgba(255,177,66,0.12);
+  --blue:       #4A9EFF;
+  --blue-dim:   rgba(74,158,255,0.12);
+  --shadow:     0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 48px rgba(0,0,0,0.6);
+  --radius:     14px;
+  --font:       'DM Sans', sans-serif;
+  --mono:       'DM Mono', monospace;
+  --display:    'Syne', sans-serif;
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { font-family:var(--font); background:var(--bg); color:var(--text); font-size:13px; min-height:100vh; }
 
-    .container{max-width:1400px;margin:0 auto;padding:28px;}
-    .kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
-    .kpi-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
-    .kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
-    .kpi-value{font-size:24px;font-weight:800;color:var(--blue-900);letter-spacing:-0.5px;}
+/* ── LOADER ─────────────────────────────────────────────── */
+#loader {
+  position:fixed; inset:0; background:var(--bg); z-index:9999;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  transition:opacity .5s;
+}
+#loader.hide { opacity:0; pointer-events:none; }
+.loader-logo { font-family:var(--display); font-size:11px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:var(--tp); margin-bottom:32px; }
+.loader-ring { width:48px; height:48px; border-radius:50%; border:2px solid var(--border2); border-top-color:var(--tp); animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.loader-status { margin-top:20px; font-size:11px; color:var(--text3); font-family:var(--mono); }
 
-    .matrix-card{background:var(--surface); padding:24px; border-radius:var(--radius); border:1px solid var(--border); overflow-x:auto;}
-    .matrix-table{width:100%; border-collapse:separate; border-spacing:4px;}
-    .matrix-header{font-size:10px; font-weight:800; text-transform:uppercase; color:var(--text3); padding:10px; text-align:center;}
-    .matrix-topic-label{font-weight:700; text-align:right; padding-right:15px; color:var(--blue-900); white-space:nowrap;}
-    .matrix-cell{border-radius:6px; padding:12px; text-align:center; font-family:var(--mono); font-weight:700; cursor:pointer; transition:transform 0.15s;}
-    .matrix-cell:hover{transform:scale(1.1); z-index:10; box-shadow:0 4px 12px rgba(0,0,0,0.1);}
-    
-    .overlay{display:none;position:fixed;inset:0;background:rgba(10,31,68,.7);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
-    .overlay.open{display:flex;}
-    .modal{background:var(--surface);border-radius:16px;width:90%;max-width:700px;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;}
-    .modal-header{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
-    .modal-body{padding:20px;overflow-y:auto;background:var(--surface2);}
-    
-    /* DRILL CARD ENHANCEMENTS */
-    .drill-card{background:#fff; border:1px solid var(--border); padding:16px; border-radius:10px; margin-bottom:12px; position:relative;}
-    .score-badge{position:absolute; top:16px; right:16px; font-size:9px; font-weight:800; padding:3px 8px; border-radius:4px; text-transform:uppercase;}
-    .badge-counts{background:var(--tp-green); color:#fff;}
-    .badge-ignored{background:var(--surface2); color:var(--text3); border:1px solid var(--border);}
-    
-    .tag-reply{background:var(--tp-green); color:#fff; padding:2px 6px; border-radius:4px; font-size:9px; font-weight:700;}
+/* ── TOPBAR ─────────────────────────────────────────────── */
+.topbar {
+  position:sticky; top:0; z-index:200;
+  background:rgba(13,15,20,0.92); backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; gap:0; padding:0 32px; height:60px;
+}
+.topbar-logo {
+  font-family:var(--display); font-size:14px; font-weight:800; letter-spacing:-.2px;
+  display:flex; align-items:center; gap:10px; margin-right:32px; padding-right:28px;
+  border-right:1px solid var(--border);
+}
+.tp-star-badge {
+  width:28px; height:28px; background:var(--tp); border-radius:6px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; color:#000; font-weight:800;
+}
+.topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+.month-select-wrap {
+  display:flex; align-items:center; gap:8px;
+  background:var(--surface2); border:1px solid var(--border2); border-radius:8px; padding:6px 14px;
+}
+.month-select-wrap select {
+  background:none; border:none; color:var(--text); font-size:13px;
+  font-family:var(--font); font-weight:600; cursor:pointer; outline:none;
+  appearance:none; -webkit-appearance:none; padding-right:16px;
+}
+.month-select-wrap select option { background:#161820; }
+.refresh-btn {
+  background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
+  padding:7px 14px; color:var(--text2); font-size:11px; font-family:var(--font);
+  font-weight:600; cursor:pointer; transition:all .2s;
+}
+.refresh-btn:hover { color:var(--tp); border-color:var(--tp); }
+.data-badge { font-size:10px; color:var(--text3); font-family:var(--mono); }
+
+/* ── LAYOUT ─────────────────────────────────────────────── */
+.container { max-width:1360px; margin:0 auto; padding:32px 28px 80px; }
+.page-fade { animation: fadeUp .4s ease both; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+/* ── SECTION HEADER ─────────────────────────────────────── */
+.section-hd {
+  display:flex; align-items:center; gap:12px; margin-bottom:16px; margin-top:32px;
+}
+.section-hd:first-child { margin-top:0; }
+.section-label {
+  font-family:var(--display); font-size:10px; font-weight:700; letter-spacing:2px;
+  text-transform:uppercase; color:var(--text3);
+}
+.section-hd::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── KPI GRID ────────────────────────────────────────────── */
+.kpi-grid { display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:8px; }
+.kpi-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 18px 16px; position:relative; overflow:hidden;
+  transition:border-color .2s, transform .2s;
+}
+.kpi-card:hover { border-color:var(--border2); transform:translateY(-1px); }
+.kpi-card-accent { position:absolute; top:0; left:0; right:0; height:2px; }
+.kpi-label { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.kpi-value { font-family:var(--display); font-size:28px; font-weight:800; line-height:1; margin-bottom:8px; letter-spacing:-1px; }
+.kpi-sub { font-size:10px; color:var(--text3); font-family:var(--mono); }
+.kpi-delta {
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
+  font-family:var(--mono); margin-top:4px;
+}
+.delta-up { background:rgba(0,182,122,.15); color:var(--tp); }
+.delta-dn { background:rgba(255,71,87,.15); color:var(--red); }
+.delta-nt { background:rgba(255,255,255,.06); color:var(--text3); }
+
+/* TRUST SCORE CARD — special */
+.kpi-score {
+  grid-column: span 2;
+  background:linear-gradient(135deg, #0a2a1e 0%, #0f1a14 100%);
+  border-color:rgba(0,182,122,.25);
+}
+.score-ring-wrap { display:flex; align-items:center; gap:20px; }
+.score-ring { position:relative; width:72px; height:72px; flex-shrink:0; }
+.score-ring svg { transform:rotate(-90deg); }
+.score-ring-label {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:1px;
+}
+.score-ring-num { font-family:var(--display); font-size:19px; font-weight:800; color:var(--tp); line-height:1; }
+.score-ring-sub { font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:var(--tp); opacity:.6; }
+.star-bars { flex:1; display:flex; flex-direction:column; gap:4px; }
+.star-bar-row { display:flex; align-items:center; gap:8px; }
+.star-bar-label { font-size:10px; color:var(--text3); font-family:var(--mono); width:12px; text-align:right; flex-shrink:0; }
+.star-bar-track { flex:1; background:var(--surface3); border-radius:2px; height:5px; }
+.star-bar-fill { height:100%; border-radius:2px; transition:width .6s ease; }
+.star-bar-count { font-size:10px; color:var(--text3); font-family:var(--mono); width:18px; text-align:right; flex-shrink:0; }
+
+/* ── RESPONSE TIME SECTION ───────────────────────────────── */
+.resp-grid { display:grid; grid-template-columns:1fr 1fr 1fr 2fr; gap:12px; }
+.resp-stat {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 18px;
+}
+.resp-stat-val { font-family:var(--display); font-size:22px; font-weight:800; margin-bottom:4px; }
+.resp-stat-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); }
+.resp-stat-sub { font-size:10px; color:var(--text3); margin-top:6px; font-family:var(--mono); }
+
+/* Response time distribution chart */
+.resp-chart-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 18px;
+}
+.resp-chart-lbl { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:14px; }
+.resp-dist { display:flex; flex-direction:column; gap:7px; }
+.resp-dist-row { display:flex; align-items:center; gap:10px; }
+.resp-dist-key { font-size:10px; color:var(--text2); width:80px; flex-shrink:0; font-family:var(--mono); }
+.resp-dist-bar { flex:1; background:var(--surface3); border-radius:2px; height:8px; }
+.resp-dist-fill { height:100%; border-radius:2px; background:var(--tp); transition:width .6s ease; }
+.resp-dist-val { font-size:10px; color:var(--text3); font-family:var(--mono); width:30px; text-align:right; flex-shrink:0; }
+
+/* ── CHARTS ROW ──────────────────────────────────────────── */
+.charts-row { display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:12px; }
+.chart-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 18px;
+}
+.chart-card-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:16px; }
+.chart-wrap { height:180px; position:relative; }
+
+/* ── MATRIX ──────────────────────────────────────────────── */
+.matrix-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:24px; overflow-x:auto;
+}
+.matrix-card-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:20px; }
+.matrix-table { width:100%; border-collapse:separate; border-spacing:5px; }
+.matrix-col-header {
+  font-size:10px; font-weight:700; text-align:center; padding:8px 6px;
+  color:var(--text3); font-family:var(--mono); letter-spacing:.5px;
+}
+.matrix-row-label {
+  font-size:12px; font-weight:600; text-align:right; padding-right:16px;
+  color:var(--text); white-space:nowrap; vertical-align:middle;
+}
+.matrix-cell {
+  border-radius:8px; padding:10px 8px; text-align:center;
+  font-family:var(--mono); font-size:13px; font-weight:700;
+  cursor:pointer; transition:transform .15s, box-shadow .15s;
+  vertical-align:middle; min-width:60px;
+}
+.matrix-cell:hover { transform:scale(1.1); box-shadow:var(--shadow); z-index:2; position:relative; }
+.matrix-cell-zero { background:var(--surface2); color:var(--text3); font-size:11px; cursor:default; }
+.matrix-cell-zero:hover { transform:none; box-shadow:none; }
+
+/* ── TOPIC BARS ──────────────────────────────────────────── */
+.topic-bars { display:flex; flex-direction:column; gap:8px; }
+.topic-bar-row { display:flex; align-items:center; gap:10px; cursor:pointer; padding:6px 8px; border-radius:8px; transition:background .15s; }
+.topic-bar-row:hover { background:var(--surface2); }
+.topic-bar-name { font-size:12px; font-weight:500; color:var(--text); width:140px; flex-shrink:0; }
+.topic-bar-track { flex:1; background:var(--surface3); border-radius:3px; height:8px; overflow:hidden; }
+.topic-bar-fill-pos { height:100%; border-radius:3px; background:var(--tp); float:left; }
+.topic-bar-fill-neg { height:100%; border-radius:3px; background:var(--red); float:left; }
+.topic-bar-fill-mix { height:100%; border-radius:3px; background:var(--amber); float:left; }
+.topic-bar-count { font-size:11px; font-weight:700; color:var(--text); font-family:var(--mono); width:26px; text-align:right; }
+.topic-bar-pct { font-size:10px; color:var(--text3); font-family:var(--mono); width:34px; text-align:right; }
+.topic-bar-arrow { color:var(--text3); }
+
+/* ── SOURCE BREAKDOWN ────────────────────────────────────── */
+.source-pills { display:flex; gap:8px; flex-wrap:wrap; }
+.source-pill {
+  background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
+  padding:10px 16px; display:flex; align-items:center; gap:10px; flex:1; min-width:120px;
+  cursor:pointer; transition:all .15s;
+}
+.source-pill:hover { border-color:var(--tp); }
+.source-pill-name { font-size:11px; font-weight:600; color:var(--text2); }
+.source-pill-val { font-family:var(--display); font-size:18px; font-weight:800; color:var(--text); margin-left:auto; }
+.source-pill-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+/* ── MODAL ───────────────────────────────────────────────── */
+.overlay {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,.75); z-index:400;
+  align-items:center; justify-content:center; backdrop-filter:blur(8px);
+}
+.overlay.open { display:flex; }
+.modal {
+  background:var(--surface); border:1px solid var(--border2); border-radius:20px;
+  width:92%; max-width:760px; max-height:88vh;
+  display:flex; flex-direction:column; overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  animation:fadeUp .2s ease;
+}
+.modal-header {
+  flex-shrink:0; padding:20px 24px 18px; border-bottom:1px solid var(--border);
+  display:flex; align-items:flex-start; gap:12px;
+}
+.modal-title { font-family:var(--display); font-size:16px; font-weight:700; color:var(--text); flex:1; }
+.modal-subtitle { font-size:11px; color:var(--text3); font-family:var(--mono); margin-top:3px; }
+.modal-close {
+  flex-shrink:0; width:28px; height:28px; border-radius:8px;
+  background:var(--surface2); border:1px solid var(--border2); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; color:var(--text2); transition:all .15s;
+}
+.modal-close:hover { background:var(--surface3); color:var(--text); }
+.modal-body { flex:1; overflow-y:auto; padding:0; }
+.modal-content { padding:16px 24px 24px; }
+
+/* Review cards */
+.review-card {
+  background:var(--surface2); border:1px solid var(--border); border-radius:10px;
+  padding:16px; margin-bottom:10px; position:relative;
+}
+.review-card:last-child { margin-bottom:0; }
+.review-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; gap:12px; }
+.review-stars { display:flex; gap:2px; flex-shrink:0; }
+.star-filled { color:var(--tp); font-size:14px; }
+.star-empty  { color:var(--surface3); font-size:14px; }
+.review-badges { display:flex; gap:6px; flex-wrap:wrap; flex:1; }
+.rbadge { font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
+.rbadge-score  { background:var(--tp-dim); color:var(--tp); border:1px solid rgba(0,182,122,.25); }
+.rbadge-muted  { background:var(--surface3); color:var(--text3); }
+.rbadge-replied{ background:var(--tp-dim); color:var(--tp); }
+.rbadge-pending{ background:rgba(255,71,87,.1); color:var(--red); }
+.rbadge-source { background:var(--blue-dim); color:var(--blue); }
+.rbadge-lang   { background:var(--surface3); color:var(--text2); }
+.review-text { font-size:12.5px; color:var(--text2); line-height:1.65; font-style:italic; margin-bottom:10px; }
+.review-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.review-meta { font-size:10px; color:var(--text3); font-family:var(--mono); }
+.review-link {
+  font-size:10px; font-weight:700; color:var(--tp); text-decoration:none;
+  border:1px solid rgba(0,182,122,.3); border-radius:5px; padding:3px 10px;
+  transition:all .15s;
+}
+.review-link:hover { background:var(--tp-dim); }
+.review-resp-time { font-size:9px; color:var(--text3); font-family:var(--mono); }
+
+/* Load more */
+.load-more-btn {
+  display:block; width:100%; padding:12px; margin-top:10px;
+  background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
+  color:var(--tp); font-size:12px; font-weight:700; font-family:var(--font);
+  cursor:pointer; transition:all .15s; text-align:center;
+}
+.load-more-btn:hover { background:var(--tp-dim); border-color:var(--tp); }
+
+/* Breadcrumb */
+.modal-bc { display:flex; align-items:center; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+.bc-item { font-size:10px; color:var(--text3); cursor:pointer; font-family:var(--mono); }
+.bc-item:hover { color:var(--tp); }
+.bc-item.cur { color:var(--text); font-weight:600; cursor:default; }
+.bc-sep { font-size:10px; color:var(--text3); }
+
+/* Count chip */
+.count-chip {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--surface2); border:1px solid var(--border2); border-radius:20px;
+  padding:4px 12px 4px 8px; margin-bottom:14px;
+  font-size:10px; color:var(--text3); font-family:var(--mono);
+}
+.count-chip-dot { width:6px; height:6px; background:var(--tp); border-radius:50%; }
+
+@media(max-width:900px){
+  .kpi-grid { grid-template-columns:1fr 1fr; }
+  .kpi-score { grid-column:span 2; }
+  .charts-row { grid-template-columns:1fr; }
+  .resp-grid { grid-template-columns:1fr 1fr; }
+  .container { padding:16px 16px 60px; }
+}
 </style>
 </head>
 <body>
 
-<nav class="topbar">
-  <div class="tp-logo"><span class="tp-star">★</span> Trustpilot Intelligence Dashboard</div>
-  <div style="margin-left:auto;"><select id="month-select" class="month-selector" onchange="updateDashboard()"></select></div>
-</nav>
-
-<div class="container">
-  <div class="kpi-row" id="kpi-container"></div>
-  
-  <div class="matrix-card">
-      <div class="kpi-label" style="margin-bottom:20px;">Topic x Market Review Matrix</div>
-      <table class="matrix-table" id="topic-matrix"></table>
-  </div>
+<div id="loader">
+  <div class="loader-logo">Trustpilot Intel</div>
+  <div class="loader-ring"></div>
+  <div class="loader-status" id="loader-status">Fetching reviews…</div>
 </div>
 
+<nav class="topbar" id="topbar" style="display:none">
+  <div class="topbar-logo">
+    <div class="tp-star-badge">★</div>
+    Trustpilot Intelligence
+  </div>
+  <div class="topbar-right">
+    <div class="data-badge" id="data-badge">—</div>
+    <div class="month-select-wrap">
+      <select id="month-select" onchange="updateDashboard()"></select>
+      <span style="color:var(--text3);font-size:11px;pointer-events:none;margin-left:-12px;">▾</span>
+    </div>
+    <button class="refresh-btn" onclick="refreshData()">↻ Refresh</button>
+  </div>
+</nav>
+
+<div class="container page-fade" id="main-container" style="display:none">
+
+  <!-- KPIs -->
+  <div class="section-hd" style="margin-top:0;"><div class="section-label">Overview</div></div>
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- Response Time -->
+  <div class="section-hd"><div class="section-label">ORM Response Time</div></div>
+  <div class="resp-grid" id="resp-grid"></div>
+
+  <!-- Charts Row -->
+  <div class="section-hd"><div class="section-label">Breakdown</div></div>
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-card-title">Reviews Over Time</div>
+      <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Sentiment Split</div>
+      <div class="chart-wrap"><canvas id="chart-sentiment"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-card-title">Review Source</div>
+      <div class="chart-wrap"><canvas id="chart-source"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Topic Analysis -->
+  <div class="section-hd"><div class="section-label">Topic Analysis</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1.5fr;gap:12px;">
+    <div class="chart-card">
+      <div class="chart-card-title">Topics by Volume — click to explore</div>
+      <div id="topic-bars"></div>
+    </div>
+    <div class="matrix-card">
+      <div class="matrix-card-title">Topic × Star Rating Matrix — click any cell</div>
+      <table class="matrix-table" id="topic-matrix"></table>
+    </div>
+  </div>
+
+  <!-- Language Breakdown -->
+  <div class="section-hd"><div class="section-label">Language Distribution</div></div>
+  <div class="source-pills" id="lang-pills"></div>
+
+</div>
+
+<!-- MODAL -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-header">
-      <div id="modal-title" style="font-weight:800;">Reviews</div>
-      <button onclick="closeModal()" style="border:none; background:none; cursor:pointer; font-size:20px;">✕</button>
+      <div>
+        <div class="modal-title" id="modal-title">Reviews</div>
+        <div class="modal-subtitle" id="modal-subtitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
 </div>
 
 <script>
-const SHEET_ID = '1wLANvdG6ga5xAEoWe7Qd8rWO1snfU-L0fnslMsKIPxw'; 
-const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+// ═══════════════════════════════════════════════════════════
+//  CONFIG
+// ═══════════════════════════════════════════════════════════
+const SHEET_ID = '1wLANvdG6ga5xAEoWe7Qd8rWO1snfU-L0fnslMsKIPxw';
+const CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const STAR_COLORS = {
+  1: '#FF4757', 2: '#FF7F50', 3: '#FFB142', 4: '#7BED9F', 5: '#00B67A'
+};
+const SENT_COLORS = { Positive:'#00B67A', Negative:'#FF4757', Mixed:'#FFB142' };
+const SOURCE_COLORS = { Organic:'#4A9EFF', InvitationLinkApi:'#00B67A', AFSv2:'#FFB142' };
+const SOURCE_LABELS = { Organic:'Organic', InvitationLinkApi:'Invited', AFSv2:'AFS' };
 
 let ALL_DATA = [];
-let currentMonth = "";
-const MONTH_NAMES = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+let CHART_INSTANCES = {};
+let currentMonth = '';
+let drillData  = [];  // for pagination
+let drillPage  = 1;
+const PAGE_SIZE = 30;
 
-function parseCSV(text) {
-    const lines = text.split(/\r?\n/);
-    return lines.map(line => {
-        const result = []; let cur = '', inQuote = false;
-        for (let char of line) {
-            if (char === '"') inQuote = !inQuote;
-            else if (char === ',' && !inQuote) { result.push(cur); cur = ''; } 
-            else cur += char;
-        }
-        result.push(cur); return result;
-    });
+// ═══════════════════════════════════════════════════════════
+//  RFC 4180 CSV PARSER
+// ═══════════════════════════════════════════════════════════
+function parseCSV(text){
+  const rows = [[]]; let cursor=0, col=0, inQ=false;
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+  while(cursor<text.length){
+    const c=text[cursor], n=text[cursor+1];
+    if(inQ){
+      if(c==='"'&&n==='"'){ rows[rows.length-1][col]=(rows[rows.length-1][col]||'')+'"'; cursor++; }
+      else if(c==='"') inQ=false;
+      else rows[rows.length-1][col]=(rows[rows.length-1][col]||'')+c;
+    } else {
+      if(c==='"') inQ=true;
+      else if(c===','){col++;rows[rows.length-1][col]='';}
+      else if(c==='\r'&&n==='\n'){rows.push([]);col=0;cursor++;}
+      else if(c==='\n'||c==='\r'){rows.push([]);col=0;}
+      else{ if(rows[rows.length-1][col]===undefined) rows[rows.length-1][col]=''; rows[rows.length-1][col]+=c; }
+    }
+    cursor++;
+  }
+  const hdrs = rows[0].map(h=>h.trim());
+  return rows.slice(1).filter(r=>r.length>2&&r.some(v=>v)).map(row=>{
+    const obj={};
+    hdrs.forEach((h,i)=>{ obj[h]=(row[i]||'').trim(); });
+    return obj;
+  });
 }
 
-async function init() {
-    const response = await fetch(CSV_URL);
-    const text = await response.text();
-    const rows = parseCSV(text);
-    
-    ALL_DATA = rows.slice(1).map(row => {
-        const dateStr = row[3] || "";
-        const d = new Date(dateStr);
-        const mKey = !isNaN(d.getTime()) ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}` : null;
-        
-        return {
-            link: row[0],
-            monthKey: mKey,
-            stars: parseInt(row[5]) || parseInt(row[4]) || 0,
-            content: row[7] || row[6] || "",
-            topic: row[12] || "Uncategorized",
-            market: (row[10] || "en").toLowerCase(),
-            replyStatus: row[8] ? row[8].trim().toLowerCase() : "",
-            countForScore: (row[15] || "").toUpperCase() === "TRUE"
-        };
-    }).filter(d => d.monthKey);
+// ═══════════════════════════════════════════════════════════
+//  FETCH & PROCESS
+// ═══════════════════════════════════════════════════════════
+function loaderMsg(t){ document.getElementById('loader-status').textContent=t; }
 
-    const monthKeys = [...new Set(ALL_DATA.map(d => d.monthKey))].sort().reverse();
-    const select = document.getElementById('month-select');
-    monthKeys.forEach(key => {
-        const [y, m] = key.split('-');
-        const opt = document.createElement('option');
-        opt.value = key; opt.text = `${MONTH_NAMES[parseInt(m)-1]} ${y}`;
-        select.appendChild(opt);
+async function fetchData(){
+  loaderMsg('Fetching from Google Sheets…');
+  const urls=[CSV_URL,`https://api.allorigins.win/raw?url=${encodeURIComponent(CSV_URL)}`];
+  let csv=null;
+  for(const u of urls){
+    try{ const r=await fetch(u,{cache:'no-store'}); if(r.ok){csv=await r.text();break;} }catch(e){}
+  }
+  if(!csv) throw new Error('Could not fetch sheet. Ensure sharing is set to Anyone with the link.');
+  loaderMsg('Processing…');
+  return processCSV(parseCSV(csv));
+}
+
+function processCSV(rows){
+  return rows.map(r=>{
+    const dateStr = r['Date']||'';
+    const d = new Date(dateStr);
+    const mKey = !isNaN(d.getTime()) ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` : null;
+    const responseStr = r['Response time']||'';
+    const rd = new Date(responseStr);
+    const respHours = (!isNaN(d.getTime())&&!isNaN(rd.getTime())) ? (rd-d)/3600000 : null;
+    return {
+      link:         r['Link'],
+      brand:        r['Brand']||'IQ Option',
+      type:         r['Type']||'Review',
+      dateRaw:      dateStr,
+      monthKey:     mKey,
+      stars:        parseInt(r['Updated Rating']||r['Original Rating'])||0,
+      content:      (r['Updated content']||r['Original content']||'').replace(/\\n/g,' ').trim(),
+      topic:        r['Topic']||'general',
+      language:     (r['Language']||'en').toLowerCase(),
+      sentiment:    r['Sentiment']||'Neutral',
+      fixed:        (r['Fixed']||'').toLowerCase()==='fixed',
+      responseTime: respHours,
+      countForScore:(r['Count for score?']||'').toLowerCase()==='true',
+      source:       r['Source']||'Organic',
+      likes:        parseInt(r['Likes'])||0,
+    };
+  }).filter(r=>r.monthKey);
+}
+
+function getMonthData(data, mk){ return mk==='all' ? data : data.filter(r=>r.monthKey===mk); }
+function getPrevMonth(mk){
+  if(mk==='all') return null;
+  const [y,m]=mk.split('-').map(Number);
+  const pm=m===1?12:m-1, py=m===1?y-1:y;
+  return `${py}-${String(pm).padStart(2,'0')}`;
+}
+function monthLabel(mk){
+  const [y,m]=mk.split('-').map(Number);
+  return `${MONTH_NAMES[m-1]} ${y}`;
+}
+function fmtHours(h){
+  if(h===null||isNaN(h)) return '—';
+  if(h<1) return `${Math.round(h*60)}m`;
+  if(h<24) return `${h.toFixed(1)}h`;
+  return `${(h/24).toFixed(1)}d`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  CHART HELPERS
+// ═══════════════════════════════════════════════════════════
+function destroyChart(id){ if(CHART_INSTANCES[id]){CHART_INSTANCES[id].destroy();delete CHART_INSTANCES[id];} }
+
+function makeDonut(id, labels, vals, colors){
+  destroyChart(id);
+  const ctx=document.getElementById(id); if(!ctx) return;
+  CHART_INSTANCES[id]=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},
+    options:{
+      responsive:true,maintainAspectRatio:false,cutout:'68%',
+      plugins:{
+        legend:{position:'right',labels:{color:'#9BA3C4',font:{family:'DM Sans',size:11},padding:10,boxWidth:10}},
+        tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} (${((c.raw/vals.reduce((a,b)=>a+b,0))*100).toFixed(1)}%)`}}
+      }
+    }
+  });
+}
+
+function makeTrendChart(id, allData){
+  destroyChart(id);
+  const ctx=document.getElementById(id); if(!ctx) return;
+  // Build weekly buckets for ALL data
+  const weeks={};
+  allData.forEach(r=>{
+    const d=new Date(r.dateRaw);
+    if(isNaN(d)) return;
+    // Round to Monday
+    const day=d.getDay(), diff=d.getDate()-day+(day===0?-6:1);
+    const monday=new Date(d); monday.setDate(diff); monday.setHours(0,0,0,0);
+    const wk=monday.toISOString().slice(0,10);
+    if(!weeks[wk]) weeks[wk]={pos:0,neg:0,mix:0};
+    if(r.sentiment==='Positive') weeks[wk].pos++;
+    else if(r.sentiment==='Negative') weeks[wk].neg++;
+    else weeks[wk].mix++;
+  });
+  const labels=Object.keys(weeks).sort();
+  CHART_INSTANCES[id]=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[
+        {label:'Positive',data:labels.map(w=>weeks[w].pos),backgroundColor:'#00B67A',borderRadius:3,borderSkipped:false},
+        {label:'Mixed',   data:labels.map(w=>weeks[w].mix),backgroundColor:'#FFB142',borderRadius:3,borderSkipped:false},
+        {label:'Negative',data:labels.map(w=>weeks[w].neg),backgroundColor:'#FF4757',borderRadius:3,borderSkipped:false},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#9BA3C4',font:{family:'DM Sans',size:10},padding:8,boxWidth:8}},tooltip:{mode:'index',intersect:false}},
+      scales:{
+        x:{stacked:true,ticks:{color:'#5C6480',font:{family:'DM Mono',size:9}},grid:{display:false}},
+        y:{stacked:true,ticks:{color:'#5C6480',font:{family:'DM Mono',size:9}},grid:{color:'rgba(255,255,255,0.04)'}}
+      }
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  RENDER FUNCTIONS
+// ═══════════════════════════════════════════════════════════
+function renderKPIs(curr, prev, allData){
+  const scoreR = curr.filter(r=>r.countForScore);
+  const avgScore = scoreR.length ? (scoreR.reduce((s,r)=>s+r.stars,0)/scoreR.length) : 0;
+  const prevScoreR = prev ? prev.filter(r=>r.countForScore) : [];
+  const prevAvg = prevScoreR.length ? (prevScoreR.reduce((s,r)=>s+r.stars,0)/prevScoreR.length) : null;
+
+  const total=curr.length, prevTotal=prev?prev.length:null;
+  const pos=curr.filter(r=>r.sentiment==='Positive').length;
+  const neg=curr.filter(r=>r.sentiment==='Negative').length;
+  const mix=curr.filter(r=>r.sentiment==='Mixed').length;
+  const replied=curr.filter(r=>r.fixed).length;
+  const replyRate=total>0?((replied/total)*100).toFixed(0):0;
+
+  // Star distribution for ring chart
+  const starCounts=[1,2,3,4,5].map(s=>scoreR.filter(r=>r.stars===s).length);
+  const maxStar=Math.max(...starCounts,1);
+
+  // Build ring SVG
+  const R=30,cx=36,cy=36,circ=2*Math.PI*R;
+  const dash=(avgScore/5)*circ;
+  const ringColor=avgScore>=4?'#00B67A':avgScore>=3?'#7BED9F':avgScore>=2?'#FFB142':'#FF4757';
+
+  function delta(curr,prev,good='up'){
+    if(prev===null||prev===0) return '';
+    const diff=curr-prev, pct=((diff/prev)*100).toFixed(1);
+    const isUp=diff>0; const cls=good==='up'?(isUp?'delta-up':'delta-dn'):(isUp?'delta-dn':'delta-up');
+    return `<div class="kpi-delta ${cls}">${isUp?'▲':'▼'} ${Math.abs(pct)}%</div>`;
+  }
+
+  document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi-card kpi-score" style="grid-column:span 2;">
+      <div class="kpi-label">TrustScore (Verified)</div>
+      <div class="score-ring-wrap" style="margin-top:10px;">
+        <div class="score-ring">
+          <svg width="72" height="72" viewBox="0 0 72 72">
+            <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
+            <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${ringColor}" stroke-width="6"
+              stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+          </svg>
+          <div class="score-ring-label">
+            <span class="score-ring-num" style="color:${ringColor}">${avgScore.toFixed(1)}</span>
+            <span class="score-ring-sub">/ 5</span>
+          </div>
+        </div>
+        <div class="star-bars">
+          ${[5,4,3,2,1].map(s=>`
+            <div class="star-bar-row">
+              <span class="star-bar-label" style="color:${STAR_COLORS[s]}">${s}</span>
+              <div class="star-bar-track"><div class="star-bar-fill" style="width:${(starCounts[s-1]/maxStar*100).toFixed(0)}%;background:${STAR_COLORS[s]}"></div></div>
+              <span class="star-bar-count">${starCounts[s-1]}</span>
+            </div>`).join('')}
+        </div>
+      </div>
+      ${prevAvg!==null?`<div style="margin-top:10px;">${delta(avgScore,prevAvg,'up')}</div>`:''}
+      <div class="kpi-sub" style="margin-top:6px;">Based on ${scoreR.length} verified reviews</div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-card-accent" style="background:#00B67A"></div>
+      <div class="kpi-label">Total Reviews</div>
+      <div class="kpi-value">${total}</div>
+      ${delta(total,prevTotal,'up')}
+    </div>
+    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Positive Reviews',curr.filter(r=>r.sentiment==='Positive'))">
+      <div class="kpi-card-accent" style="background:#00B67A"></div>
+      <div class="kpi-label">Positive</div>
+      <div class="kpi-value" style="color:var(--tp)">${pos}</div>
+      <div class="kpi-sub">${total>0?((pos/total)*100).toFixed(0):0}% of total</div>
+    </div>
+    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Negative Reviews',curr.filter(r=>r.sentiment==='Negative'))">
+      <div class="kpi-card-accent" style="background:var(--red)"></div>
+      <div class="kpi-label">Negative</div>
+      <div class="kpi-value" style="color:var(--red)">${neg}</div>
+      <div class="kpi-sub">${total>0?((neg/total)*100).toFixed(0):0}% of total</div>
+    </div>
+    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Mixed Reviews',curr.filter(r=>r.sentiment==='Mixed'))">
+      <div class="kpi-card-accent" style="background:var(--amber)"></div>
+      <div class="kpi-label">Mixed</div>
+      <div class="kpi-value" style="color:var(--amber)">${mix}</div>
+      <div class="kpi-sub">${total>0?((mix/total)*100).toFixed(0):0}% of total</div>
+    </div>
+    <div class="kpi-card" onclick="openReviewModal('Replied Reviews',curr.filter(r=>r.fixed))" style="cursor:pointer">
+      <div class="kpi-card-accent" style="background:var(--blue)"></div>
+      <div class="kpi-label">ORM Replied</div>
+      <div class="kpi-value" style="color:var(--blue)">${replied}</div>
+      <div class="kpi-sub">${replyRate}% reply rate</div>
+    </div>
+  `;
+}
+
+function renderResponseTime(curr){
+  const withResp=curr.filter(r=>r.responseTime!==null&&r.responseTime>=0);
+  if(!withResp.length){
+    document.getElementById('resp-grid').innerHTML='<div style="color:var(--text3);font-size:12px;padding:12px;">No response time data for this period.</div>';
+    return;
+  }
+  const times=withResp.map(r=>r.responseTime).sort((a,b)=>a-b);
+  const avg=times.reduce((s,t)=>s+t,0)/times.length;
+  const median=times[Math.floor(times.length/2)];
+  const fastest=times[0];
+  const slowest=times[times.length-1];
+
+  // Buckets for distribution
+  const buckets=[
+    {label:'<4h',  max:4},
+    {label:'4–24h',min:4,max:24},
+    {label:'1–3d', min:24,max:72},
+    {label:'3–7d', min:72,max:168},
+    {label:'>7d',  min:168},
+  ];
+  const bCounts=buckets.map(b=>{
+    return times.filter(t=>(b.min===undefined||t>=b.min)&&(b.max===undefined||t<b.max)).length;
+  });
+  const maxB=Math.max(...bCounts,1);
+
+  document.getElementById('resp-grid').innerHTML=`
+    <div class="resp-stat">
+      <div class="resp-stat-lbl">Avg Response</div>
+      <div class="resp-stat-val" style="color:${avg<24?'var(--tp)':avg<72?'var(--amber)':'var(--red)'}">${fmtHours(avg)}</div>
+      <div class="resp-stat-sub">${withResp.length} reviews with response</div>
+    </div>
+    <div class="resp-stat">
+      <div class="resp-stat-lbl">Median</div>
+      <div class="resp-stat-val">${fmtHours(median)}</div>
+      <div class="resp-stat-sub">50th percentile</div>
+    </div>
+    <div class="resp-stat">
+      <div class="resp-stat-lbl">Fastest → Slowest</div>
+      <div class="resp-stat-val" style="font-size:16px;">${fmtHours(fastest)} → ${fmtHours(slowest)}</div>
+      <div class="resp-stat-sub">range</div>
+    </div>
+    <div class="resp-chart-card">
+      <div class="resp-chart-lbl">Response Time Distribution</div>
+      <div class="resp-dist">
+        ${buckets.map((b,i)=>`
+          <div class="resp-dist-row">
+            <span class="resp-dist-key">${b.label}</span>
+            <div class="resp-dist-bar"><div class="resp-dist-fill" style="width:${(bCounts[i]/maxB*100).toFixed(0)}%"></div></div>
+            <span class="resp-dist-val">${bCounts[i]}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function renderCharts(curr, allData){
+  // Trend: use all data for context, highlight current month
+  makeTrendChart('chart-trend', allData);
+
+  // Sentiment donut
+  const pos=curr.filter(r=>r.sentiment==='Positive').length;
+  const neg=curr.filter(r=>r.sentiment==='Negative').length;
+  const mix=curr.filter(r=>r.sentiment==='Mixed').length;
+  makeDonut('chart-sentiment',['Positive','Negative','Mixed'],[pos,neg,mix],['#00B67A','#FF4757','#FFB142']);
+
+  // Source donut
+  const sources={};
+  curr.forEach(r=>sources[r.source]=(sources[r.source]||0)+1);
+  const sKeys=Object.keys(sources);
+  makeDonut('chart-source',sKeys.map(s=>SOURCE_LABELS[s]||s),sKeys.map(s=>sources[s]),sKeys.map(s=>SOURCE_COLORS[s]||'#4A9EFF'));
+}
+
+function renderTopicBars(curr){
+  const topics={};
+  curr.forEach(r=>{
+    if(!topics[r.topic]) topics[r.topic]={pos:0,neg:0,mix:0,total:0};
+    topics[r.topic].total++;
+    if(r.sentiment==='Positive') topics[r.topic].pos++;
+    else if(r.sentiment==='Negative') topics[r.topic].neg++;
+    else topics[r.topic].mix++;
+  });
+  const sorted=Object.entries(topics).sort((a,b)=>b[1].total-a[1].total);
+  const maxT=sorted[0]?sorted[0][1].total:1;
+  const el=document.getElementById('topic-bars');
+  el.innerHTML=`<div class="topic-bars">${sorted.map(([t,v])=>{
+    const pw=((v.pos/maxT)*100).toFixed(0);
+    const nw=((v.neg/maxT)*100).toFixed(0);
+    const mw=((v.mix/maxT)*100).toFixed(0);
+    return `<div class="topic-bar-row" onclick="openReviewModal('Topic: ${t}', curr.filter(r=>r.topic==='${t}'))">
+      <span class="topic-bar-name">${t}</span>
+      <div class="topic-bar-track">
+        <div class="topic-bar-fill-neg" style="width:${nw}%"></div>
+        <div class="topic-bar-fill-mix" style="width:${mw}%"></div>
+        <div class="topic-bar-fill-pos" style="width:${pw}%"></div>
+      </div>
+      <span class="topic-bar-count">${v.total}</span>
+      <span class="topic-bar-arrow">›</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderMatrix(curr){
+  const topics=[...new Set(curr.map(r=>r.topic))].sort();
+  const stars=[1,2,3,4,5];
+  const table=document.getElementById('topic-matrix');
+  let html=`<thead><tr><th></th>`;
+  stars.forEach(s=>html+=`<th class="matrix-col-header" style="color:${STAR_COLORS[s]}">${'★'.repeat(s)}</th>`);
+  html+=`</tr></thead><tbody>`;
+  topics.forEach(t=>{
+    html+=`<tr><td class="matrix-row-label">${t}</td>`;
+    stars.forEach(s=>{
+      const matches=curr.filter(r=>r.topic===t&&r.stars===s);
+      const cnt=matches.length;
+      if(cnt===0){
+        html+=`<td class="matrix-cell matrix-cell-zero">·</td>`;
+      } else {
+        const opacity=0.15+(cnt/12)*0.7;
+        const col=s<=2?'255,71,87':s===3?'255,177,66':s===4?'123,237,159':'0,182,122';
+        html+=`<td class="matrix-cell" style="background:rgba(${col},${Math.min(opacity,0.85)});color:rgb(${col});"
+          onclick="openReviewModal('${t} · ${s}★', curr.filter(r=>r.topic==='${t}'&&r.stars===${s}))">${cnt}</td>`;
+      }
     });
+    html+=`</tr>`;
+  });
+  table.innerHTML=html+`</tbody>`;
+}
 
-    currentMonth = monthKeys[0];
+function renderLangPills(curr){
+  const langs={};
+  curr.forEach(r=>langs[r.language]=(langs[r.language]||0)+1);
+  const sorted=Object.entries(langs).sort((a,b)=>b[1]-a[1]);
+  const langNames={'en':'English','es':'Spanish','pt':'Portuguese','fr':'French','de':'German','th':'Thai','my':'Malay'};
+  const langColors=['#00B67A','#4A9EFF','#FFB142','#FF4757','#C471ED','#7BED9F','#FF6B9D'];
+  document.getElementById('lang-pills').innerHTML=sorted.map(([l,cnt],i)=>`
+    <div class="source-pill" onclick="openReviewModal('Language: ${langNames[l]||l.toUpperCase()}', curr.filter(r=>r.language==='${l}'))">
+      <div class="source-pill-dot" style="background:${langColors[i%langColors.length]}"></div>
+      <div>
+        <div class="source-pill-name">${langNames[l]||l.toUpperCase()}</div>
+        <div style="font-size:9px;color:var(--text3);margin-top:2px;">${((cnt/curr.length)*100).toFixed(0)}%</div>
+      </div>
+      <div class="source-pill-val">${cnt}</div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  REVIEW MODAL
+// ═══════════════════════════════════════════════════════════
+// Store for pagination — expose globally
+let _modalRows=[], _modalPage=1;
+
+function openReviewModal(title, rows){
+  _modalRows=[...rows].sort((a,b)=>new Date(b.dateRaw)-new Date(a.dateRaw));
+  _modalPage=1;
+  document.getElementById('modal-title').textContent=title;
+  document.getElementById('modal-subtitle').textContent=`${rows.length} review${rows.length!==1?'s':''} · most recent first`;
+  document.getElementById('modal-body').innerHTML='<div class="modal-content">'+buildReviewPage()+'</div>';
+  document.getElementById('overlay').classList.add('open');
+}
+
+function buildReviewPage(){
+  const showing=Math.min(_modalPage*PAGE_SIZE,_modalRows.length);
+  const slice=_modalRows.slice(0,showing);
+  let html=`<div class="count-chip"><span class="count-chip-dot"></span>Showing ${showing} of ${_modalRows.length}</div>`;
+  html+=slice.map(r=>reviewCardHtml(r)).join('');
+  if(showing<_modalRows.length){
+    html+=`<button class="load-more-btn" onclick="loadMoreReviews()">Load ${Math.min(PAGE_SIZE,_modalRows.length-showing)} more <span style="opacity:.5;">(${_modalRows.length-showing} remaining)</span></button>`;
+  } else if(_modalRows.length>PAGE_SIZE){
+    html+=`<div style="text-align:center;padding:12px;font-size:10px;color:var(--text3);font-family:var(--mono);">All ${_modalRows.length} reviews loaded</div>`;
+  }
+  return html;
+}
+
+function loadMoreReviews(){
+  _modalPage++;
+  const body=document.getElementById('modal-body');
+  const scrollTop=body.scrollTop;
+  body.innerHTML='<div class="modal-content">'+buildReviewPage()+'</div>';
+  body.scrollTop=scrollTop;
+}
+
+function reviewCardHtml(r){
+  const stars='★'.repeat(r.stars)+'☆'.repeat(5-r.stars);
+  const starsHtml=r.stars>0?`<div class="review-stars">${
+    Array.from(stars).map(s=>s==='★'?`<span class="star-filled">★</span>`:`<span class="star-empty">☆</span>`).join('')
+  }</div>`:'';
+  const respStr=r.responseTime!==null?fmtHours(r.responseTime):null;
+  const truncated=r.content.length>350?r.content.slice(0,350)+'…':r.content;
+  const dateLabel=r.dateRaw?new Date(r.dateRaw).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
+  return `<div class="review-card">
+    <div class="review-card-top">
+      ${starsHtml}
+      <div class="review-badges">
+        ${r.countForScore?'<span class="rbadge rbadge-score">✓ Counts</span>':'<span class="rbadge rbadge-muted">Muted</span>'}
+        ${r.fixed?'<span class="rbadge rbadge-replied">✓ Replied</span>':'<span class="rbadge rbadge-pending">Pending</span>'}
+        <span class="rbadge rbadge-source">${SOURCE_LABELS[r.source]||r.source}</span>
+        <span class="rbadge rbadge-lang">${r.language.toUpperCase()}</span>
+      </div>
+    </div>
+    ${truncated?`<div class="review-text">"${truncated}"</div>`:''}
+    <div class="review-footer">
+      <div>
+        <div class="review-meta">📅 ${dateLabel}${r.topic?' · '+r.topic:''}</div>
+        ${respStr?`<div class="review-resp-time" style="margin-top:3px;">⏱ Replied in ${respStr}</div>`:''}
+      </div>
+      ${r.link?`<a href="${r.link}" target="_blank" rel="noopener" class="review-link">View on Trustpilot ↗</a>`:''}
+    </div>
+  </div>`;
+}
+
+function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
+
+// ═══════════════════════════════════════════════════════════
+//  MAIN UPDATE
+// ═══════════════════════════════════════════════════════════
+
+// Expose curr to onclick handlers in topic bars/matrix
+let _currData=[];
+
+function updateDashboard(){
+  const mk=document.getElementById('month-select').value;
+  currentMonth=mk;
+  const curr=getMonthData(ALL_DATA,mk);
+  const pmk=getPrevMonth(mk);
+  const prev=pmk?getMonthData(ALL_DATA,pmk):null;
+  _currData=curr;
+
+  // Patch onclick references that use curr
+  window.curr=curr;
+
+  renderKPIs(curr,prev,ALL_DATA);
+  renderResponseTime(curr);
+  renderCharts(curr,ALL_DATA);
+  renderTopicBars(curr);
+  renderMatrix(curr);
+  renderLangPills(curr);
+  document.getElementById('data-badge').textContent=`${curr.length} reviews · ${mk==='all'?'All time':monthLabel(mk)}`;
+}
+
+async function refreshData(){
+  const btn=document.querySelector('.refresh-btn');
+  btn.textContent='↻ Loading…'; btn.disabled=true;
+  try{ const rows=await fetchData(); ALL_DATA=rows; updateDashboard(); }
+  catch(e){ alert('Refresh failed: '+e.message); }
+  btn.textContent='↻ Refresh'; btn.disabled=false;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('load',async()=>{
+  try{
+    const rows=await fetchData();
+    ALL_DATA=rows;
+
+    const monthKeys=[...new Set(rows.map(r=>r.monthKey))].sort().reverse();
+    const sel=document.getElementById('month-select');
+    sel.innerHTML='<option value="all">All Time</option>';
+    monthKeys.forEach(mk=>{
+      const o=document.createElement('option');
+      o.value=mk; o.textContent=monthLabel(mk);
+      sel.appendChild(o);
+    });
+    sel.value=monthKeys[0]||'all';
+    currentMonth=sel.value;
+
+    document.getElementById('loader').classList.add('hide');
+    setTimeout(()=>document.getElementById('loader').style.display='none',500);
+    document.getElementById('topbar').style.display='flex';
+    document.getElementById('main-container').style.display='block';
+
     updateDashboard();
-}
-
-function updateDashboard() {
-    currentMonth = document.getElementById('month-select').value;
-    const filtered = ALL_DATA.filter(d => d.monthKey === currentMonth);
-    renderKPIs(filtered);
-    renderMatrix(filtered);
-}
-
-function renderKPIs(data) {
-    // FILTER: Only account for reviews that count for score
-    const scoreReviews = data.filter(r => r.countForScore === true);
-    const avg = scoreReviews.length ? (scoreReviews.reduce((s, r) => s + r.stars, 0) / scoreReviews.length).toFixed(1) : "0.0";
-    
-    // Total Positive/Negative from ALL reviews (standard ORM view)
-    const pos = data.filter(r => r.stars >= 4).length;
-    const neg = data.filter(r => r.stars <= 2).length;
-
-    const topics = {};
-    data.forEach(r => topics[r.topic] = (topics[r.topic] || 0) + 1);
-    const mainTopic = Object.entries(topics).sort((a,b) => b[1] - a[1])[0]?.[0] || "None";
-
-    document.getElementById('kpi-container').innerHTML = `
-        <div class="kpi-card">
-            <div class="kpi-label">Verified TrustScore</div>
-            <div class="kpi-value">${avg} ★</div>
-            <div style="font-size:9px; color:var(--text3); margin-top:5px;">Based on ${scoreReviews.length} verified reviews</div>
-        </div>
-        <div class="kpi-card"><div class="kpi-label">Positive</div><div class="kpi-value" style="color:var(--positive)">${pos}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Negative</div><div class="kpi-value" style="color:var(--negative)">${neg}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Main Topic</div><div class="kpi-value" style="font-size:16px;">${mainTopic}</div></div>
-        <div class="kpi-card"><div class="kpi-label">Total Reviews</div><div class="kpi-value">${data.length}</div></div>
-    `;
-}
-
-function renderMatrix(data) {
-    const markets = [...new Set(data.map(r => r.market))].sort();
-    const topics = [...new Set(data.map(r => r.topic))].sort();
-    const table = document.getElementById('topic-matrix');
-    
-    let html = `<thead><tr><th></th>`;
-    markets.forEach(m => html += `<th class="matrix-header">${m.toUpperCase()}</th>`);
-    html += `</tr></thead><tbody>`;
-
-    topics.forEach(t => {
-        html += `<tr><td class="matrix-topic-label">${t}</td>`;
-        markets.forEach(m => {
-            const count = data.filter(r => r.topic === t && r.market === m).length;
-            const opacity = count > 0 ? 0.1 + (count / 10) : 0;
-            const color = t.toLowerCase().includes('scam') || t.toLowerCase().includes('block') || t.toLowerCase().includes('withdraw') ? '220, 38, 38' : '0, 182, 122';
-            
-            html += `<td class="matrix-cell" style="background:rgba(${color}, ${opacity}); color:rgb(${color});" 
-                     onclick="openDrill('${t} in ${m.toUpperCase()}', '${t}', '${m}')">
-                     <span class="cell-val">${count || '-'}</span>
-                     </td>`;
-        });
-        html += `</tr>`;
-    });
-    table.innerHTML = html + `</tbody>`;
-}
-
-function openDrill(title, topic, market) {
-    const list = ALL_DATA.filter(r => r.monthKey === currentMonth && r.topic === topic && r.market === market);
-    document.getElementById('modal-title').textContent = `${title} (${list.length})`;
-    document.getElementById('modal-body').innerHTML = list.map(r => `
-        <div class="drill-card">
-            <span class="score-badge ${r.countForScore ? 'badge-counts' : 'badge-ignored'}">
-                ${r.countForScore ? '✓ Counts for Score' : 'Muted / No Impact'}
-            </span>
-            <div style="color:var(--tp-green); margin-bottom:8px;">${'★'.repeat(r.stars)}</div>
-            <div style="font-style:italic; margin-bottom:10px; padding-right:100px;">"${r.content}"</div>
-            <div style="font-size:11px; color:var(--text3); display:flex; justify-content:space-between;">
-                <span>${r.replyStatus === 'fixed' ? '<b style="color:var(--tp-green)">✓ REPLIED</b>' : 'PENDING REPLY'}</span>
-                <a href="${r.link}" target="_blank" style="color:var(--tp-dark); font-weight:700;">View Review ↗</a>
-            </div>
-        </div>
-    `).join('');
-    document.getElementById('overlay').classList.add('open');
-}
-
-function closeModal() { document.getElementById('overlay').classList.remove('open'); }
-
-init();
+  }catch(err){
+    document.getElementById('loader-status').textContent='';
+    const e=document.getElementById('loader');
+    e.innerHTML+=`<div style="margin-top:20px;color:#FF4757;font-size:12px;max-width:380px;text-align:center;line-height:1.6;">
+      <strong>Failed to load data.</strong><br>${err.message}<br><br>
+      <button onclick="location.reload()" style="background:var(--tp);color:#000;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700;font-family:var(--font);">Retry</button>
+    </div>`;
+  }
+});
 </script>
 </body>
 </html>
