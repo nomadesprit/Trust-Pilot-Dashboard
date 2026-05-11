@@ -596,78 +596,67 @@ function renderOverallCard(allData){
   const starCounts=[1,2,3,4,5].map(s=>scoreR.filter(r=>r.stars===s).length);
   const maxStar=Math.max(...starCounts,1);
   const totalReviews = allData.length;
-  const displayRating = overallRating !== null ? overallRating : (
+  const displayRating = (overallRating !== null && !isNaN(overallRating)) ? overallRating : (
     scoreR.length ? (scoreR.reduce((s,r)=>s+r.stars,0)/scoreR.length) : 0
   );
 
-  // Render Trustpilot-style stars (full, half logic simplified)
-  function starHtml(rating){
-    let html='';
-    for(let i=1;i<=5;i++){
-      if(rating >= i) html+=`<span class="overall-star" style="color:var(--tp)">★</span>`;
-      else if(rating >= i-0.5) html+=`<span class="overall-star" style="color:var(--tp)">★</span>`;
-      else html+=`<span class="overall-star" style="color:var(--surface3)">★</span>`;
-    }
-    return html;
+  // Stars HTML — built without nested template literals
+  let starsHtml = '';
+  for(let i=1;i<=5;i++){
+    const col = i <= Math.round(displayRating) ? 'var(--tp)' : 'var(--surface3)';
+    starsHtml += '<span class="overall-star" style="color:'+col+'">★</span>';
   }
 
-  // Find earliest and latest dates
+  // Date range
   const dates = allData.map(r=>new Date(r.dateRaw)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
   const dateRange = dates.length>=2
-    ? `${dates[0].toLocaleDateString('en-GB',{month:'short',year:'numeric'})} – ${dates[dates.length-1].toLocaleDateString('en-GB',{month:'short',year:'numeric'})}`
+    ? dates[0].toLocaleDateString('en-GB',{month:'short',year:'numeric'})+' – '+dates[dates.length-1].toLocaleDateString('en-GB',{month:'short',year:'numeric'})
     : '';
 
-  return `
-    <div class="kpi-card kpi-overall">
-      <div class="kpi-card-accent" style="background:linear-gradient(90deg,var(--tp),#7BDA9F)"></div>
-      <div class="kpi-label" style="margin-bottom:16px;">Trustpilot Overall Rating</div>
-      <div class="overall-inner">
+  // Star bars — built without nested template literals
+  const SCOLS = {1:'#E8304A',2:'#F07A30',3:'#F59D12',4:'#7BDA9F',5:'#00B67A'};
+  let starBarsHtml = '';
+  [5,4,3,2,1].forEach(function(s){
+    const w = (starCounts[s-1]/maxStar*100).toFixed(0);
+    starBarsHtml += '<div class="obar-row">'
+      + '<span class="obar-label" style="color:'+SCOLS[s]+'">'+s+'</span>'
+      + '<div class="obar-track"><div class="obar-fill" style="width:'+w+'%;background:'+SCOLS[s]+'"></div></div>'
+      + '<span class="obar-count">'+starCounts[s-1]+'</span>'
+      + '</div>';
+  });
 
-        <div>
-          <div class="overall-score-wrap">
-            <span class="overall-score-num">${displayRating.toFixed(1)}</span>
-            <span class="overall-score-denom">/ 5</span>
-          </div>
-          <div class="overall-stars">${starHtml(displayRating)}</div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px;">${dateRange}</div>
-        </div>
-
-        <div class="overall-divider"></div>
-
-        <div class="overall-meta">
-          <div class="overall-meta-label">Total Reviews</div>
-          <div class="overall-meta-val">${totalReviews.toLocaleString()}</div>
-          <div class="overall-meta-sub">in database</div>
-        </div>
-
-        <div class="overall-divider"></div>
-
-        <div class="overall-meta">
-          <div class="overall-meta-label">Verified Reviews</div>
-          <div class="overall-meta-val">${scoreR.length.toLocaleString()}</div>
-          <div class="overall-meta-sub">count for score</div>
-        </div>
-
-        <div class="overall-divider"></div>
-
-        <div class="overall-bar-section">
-          <div class="overall-bar-title">Star Distribution</div>
-          ${[5,4,3,2,1].map(s=>`
-            <div class="obar-row">
-              <span class="obar-label" style="color:${STAR_COLORS[s]}">${s}</span>
-              <div class="obar-track"><div class="obar-fill" style="width:${(starCounts[s-1]/maxStar*100).toFixed(0)}%;background:${STAR_COLORS[s]}"></div></div>
-              <span class="obar-count">${starCounts[s-1]}</span>
-            </div>`).join('')}
-        </div>
-
-        <div>
-          <a href="https://www.trustpilot.com" target="_blank" rel="noopener" class="tp-badge-link">
-            ★ View on Trustpilot
-          </a>
-        </div>
-
-      </div>
-    </div>`;
+  return '<div class="kpi-card kpi-overall">'
+    + '<div class="kpi-card-accent" style="background:linear-gradient(90deg,var(--tp),#7BDA9F)"></div>'
+    + '<div class="kpi-label" style="margin-bottom:16px;">Trustpilot Overall Rating</div>'
+    + '<div class="overall-inner">'
+      + '<div>'
+        + '<div class="overall-score-wrap">'
+          + '<span class="overall-score-num">'+displayRating.toFixed(1)+'</span>'
+          + '<span class="overall-score-denom">/ 5</span>'
+        + '</div>'
+        + '<div class="overall-stars">'+starsHtml+'</div>'
+        + '<div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px;">'+dateRange+'</div>'
+      + '</div>'
+      + '<div class="overall-divider"></div>'
+      + '<div class="overall-meta">'
+        + '<div class="overall-meta-label">Total Reviews</div>'
+        + '<div class="overall-meta-val">'+totalReviews.toLocaleString()+'</div>'
+        + '<div class="overall-meta-sub">in database</div>'
+      + '</div>'
+      + '<div class="overall-divider"></div>'
+      + '<div class="overall-meta">'
+        + '<div class="overall-meta-label">Verified Reviews</div>'
+        + '<div class="overall-meta-val">'+scoreR.length.toLocaleString()+'</div>'
+        + '<div class="overall-meta-sub">count for score</div>'
+      + '</div>'
+      + '<div class="overall-divider"></div>'
+      + '<div class="overall-bar-section">'
+        + '<div class="overall-bar-title">Star Distribution</div>'
+        + starBarsHtml
+      + '</div>'
+      + '<div><a href="https://www.trustpilot.com/review/iqoption.com" target="_blank" rel="noopener" class="tp-badge-link">★ View on Trustpilot</a></div>'
+    + '</div>'
+  + '</div>';
 }
 
 function renderKPIs(curr, prev, allData){
