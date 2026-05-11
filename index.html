@@ -371,7 +371,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   <!-- Charts Row -->
   <div class="section-hd"><div class="section-label">Breakdown</div></div>
   <div class="chart-card" style="margin-bottom:12px;">
-    <div class="chart-card-title">Reviews Over Time</div>
+    <div class="chart-card-title" id="trend-chart-title">Reviews Over Time</div>
     <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
@@ -530,37 +530,53 @@ function makeDonut(id, labels, vals, colors){
   });
 }
 
-function makeTrendChart(id, allData){
+function makeTrendChart(id, curr, mk){
   destroyChart(id);
   const ctx=document.getElementById(id); if(!ctx) return;
-  const weeks={};
-  allData.forEach(r=>{
-    const d=new Date(r.dateRaw); if(isNaN(d)) return;
-    const day=d.getDay(),diff=d.getDate()-day+(day===0?-6:1);
-    const monday=new Date(d); monday.setDate(diff); monday.setHours(0,0,0,0);
-    const wk=monday.toISOString().slice(0,10);
-    if(!weeks[wk]) weeks[wk]={pos:0,neg:0,mix:0};
-    if(r.sentiment==='Positive') weeks[wk].pos++;
-    else if(r.sentiment==='Negative') weeks[wk].neg++;
-    else weeks[wk].mix++;
-  });
-  const labels=Object.keys(weeks).sort();
+  const days={};
+  if(mk==='all'){
+    curr.forEach(r=>{ const key=r.monthKey; if(!key) return; days[key]=(days[key]||0)+1; });
+  } else {
+    const [y,m]=mk.split('-').map(Number);
+    const daysInMonth=new Date(y,m,0).getDate();
+    for(let d=1;d<=daysInMonth;d++) days[`${mk}-${String(d).padStart(2,'0')}`]=0;
+    curr.forEach(r=>{
+      const d=new Date(r.dateRaw); if(isNaN(d)) return;
+      const key=`${r.monthKey}-${String(d.getDate()).padStart(2,'0')}`;
+      if(key in days) days[key]++;
+    });
+  }
+  const labels=Object.keys(days).sort();
+  const vals=labels.map(l=>days[l]);
+  const tickLabels=mk==='all'
+    ? labels.map(l=>{ const [y,mo]=l.split('-').map(Number); return MONTH_NAMES[mo-1].slice(0,3)+' '+String(y).slice(2); })
+    : labels.map(l=>parseInt(l.split('-')[2]));
   CHART_INSTANCES[id]=new Chart(ctx,{
-    type:'bar',
-    data:{
-      labels,
-      datasets:[
-        {label:'Positive',data:labels.map(w=>weeks[w].pos),backgroundColor:'#008A5C',borderRadius:3,borderSkipped:false},
-        {label:'Mixed',   data:labels.map(w=>weeks[w].mix),backgroundColor:'#D97706',borderRadius:3,borderSkipped:false},
-        {label:'Negative',data:labels.map(w=>weeks[w].neg),backgroundColor:'#DC2626',borderRadius:3,borderSkipped:false},
-      ]
-    },
+    type:'line',
+    data:{labels:tickLabels,datasets:[{
+      label:'Reviews',data:vals,
+      borderColor:'#008A5C',backgroundColor:'rgba(0,138,92,0.08)',
+      borderWidth:2,tension:0.35,fill:true,
+      pointRadius:vals.map(v=>v>0?4:0),pointHoverRadius:6,
+      pointBackgroundColor:'#008A5C',pointBorderColor:'#ffffff',pointBorderWidth:2,
+    }]},
     options:{
       responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{labels:{color:'#374151',font:{family:'Geist',size:10},padding:8,boxWidth:8}},tooltip:{mode:'index',intersect:false}},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          title:(items)=>{
+            const idx=items[0].dataIndex;
+            if(mk==='all') return tickLabels[idx];
+            const [y,mo]=mk.split('-').map(Number);
+            return `${tickLabels[idx]} ${MONTH_NAMES[mo-1]} ${y}`;
+          },
+          label:(c)=>` ${c.raw} review${c.raw!==1?'s':''}`
+        }}
+      },
       scales:{
-        x:{stacked:true,ticks:{color:'#8B93A7',font:{family:'Geist Mono',size:9}},grid:{display:false}},
-        y:{stacked:true,ticks:{color:'#8B93A7',font:{family:'Geist Mono',size:9}},grid:{color:'rgba(0,0,0,0.05)'}}
+        x:{ticks:{color:'#8B93A7',font:{family:'Geist Mono',size:9},maxTicksLimit:mk==='all'?12:31,maxRotation:0},grid:{display:false}},
+        y:{beginAtZero:true,ticks:{color:'#8B93A7',font:{family:'Geist Mono',size:9},precision:0},grid:{color:'rgba(0,0,0,0.05)'}}
       }
     }
   });
@@ -688,8 +704,10 @@ function renderKPIs(curr, prev, allData, globalRating){
   `;
 }
 
-function renderCharts(curr, allData){
-  makeTrendChart('chart-trend', allData);
+function renderCharts(curr, allData, mk){
+  const titleEl=document.getElementById('trend-chart-title');
+  if(titleEl) titleEl.textContent = mk==='all' ? 'Reviews Over Time — All Time' : `Daily Reviews — ${monthLabel(mk)}`;
+  makeTrendChart('chart-trend', curr, mk);
   const pos=curr.filter(r=>r.sentiment==='Positive').length;
   const neg=curr.filter(r=>r.sentiment==='Negative').length;
   const mix=curr.filter(r=>r.sentiment==='Mixed').length;
@@ -851,7 +869,7 @@ function updateDashboard(){
   // Pull most recent non-null overallRating from the full dataset
   const globalRating = ALL_DATA.slice().reverse().find(r=>r.overallRating!==null)?.overallRating ?? null;
   renderKPIs(curr,prev,ALL_DATA,globalRating);
-  renderCharts(curr,ALL_DATA);
+  renderCharts(curr,ALL_DATA,mk);
   renderTopicBars(curr);
   renderMatrix(curr);
   renderLangPills(curr);
