@@ -131,6 +131,47 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   background:linear-gradient(135deg, #f0faf5 0%, #fafffe 100%);
   border-color:rgba(0,138,92,.2);
 }
+/* GLOBAL RATING HERO — first card */
+.kpi-global {
+  grid-column: span 6;
+  background: linear-gradient(135deg, #f0faf5 0%, #f5fbff 100%);
+  border-color: rgba(0,138,92,.25);
+  display: flex; align-items: center; gap: 32px; padding: 22px 28px;
+}
+.kpi-global-score {
+  display: flex; align-items: baseline; gap: 10px; flex-shrink: 0;
+}
+.kpi-global-num {
+  font-family: var(--display); font-size: 52px; font-weight: 800;
+  line-height: 1; letter-spacing: -2px; color: var(--tp);
+}
+.kpi-global-denom {
+  font-size: 18px; font-weight: 600; color: var(--text3); font-family: var(--display);
+}
+.kpi-global-divider {
+  width: 1px; height: 56px; background: var(--border2); flex-shrink: 0;
+}
+.kpi-global-stars {
+  display: flex; gap: 6px; font-size: 22px; flex-shrink: 0;
+}
+.kpi-global-meta { flex: 1; }
+.kpi-global-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text3); margin-bottom: 4px;
+}
+.kpi-global-title {
+  font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--text);
+  margin-bottom: 4px;
+}
+.kpi-global-sub {
+  font-size: 11px; color: var(--text3); font-family: var(--mono);
+}
+.kpi-global-badge {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+  background: var(--tp-dim); border: 1px solid rgba(0,138,92,.2);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 11px; font-weight: 700; color: var(--tp); font-family: var(--mono);
+}
 .score-ring-wrap { display:flex; align-items:center; gap:20px; }
 .score-ring { position:relative; width:72px; height:72px; flex-shrink:0; }
 .score-ring svg { transform:rotate(-90deg); }
@@ -292,6 +333,8 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 @media(max-width:900px){
   .kpi-grid { grid-template-columns:1fr 1fr; }
   .kpi-score { grid-column:span 2; }
+  .kpi-global { grid-column:span 2; flex-wrap:wrap; gap:16px; }
+  .kpi-global-divider { display:none; }
   .container { padding:16px 16px 60px; }
 }
 </style>
@@ -446,6 +489,7 @@ function processCSV(rows){
       sentiment:r['Sentiment']||'Neutral', fixed:(r['Fixed']||'').toLowerCase()==='fixed',
       responseTime:respHours, countForScore:(r['Count for score?']||'').toLowerCase()==='true',
       source:r['Source']||'Organic', likes:parseInt(r['Likes'])||0,
+      overallRating:parseFloat(r['Overall rating'])||null,
     };
   }).filter(r=>r.monthKey);
 }
@@ -522,7 +566,7 @@ function makeTrendChart(id, allData){
   });
 }
 
-function renderKPIs(curr, prev, allData){
+function renderKPIs(curr, prev, allData, globalRating){
   const scoreR=curr.filter(r=>r.countForScore);
   const avgScore=scoreR.length?(scoreR.reduce((s,r)=>s+r.stars,0)/scoreR.length):0;
   const prevScoreR=prev?prev.filter(r=>r.countForScore):[];
@@ -554,7 +598,30 @@ function renderKPIs(curr, prev, allData){
     return `<div class="kpi-delta ${cls}">${isUp?'▲':'▼'} ${Math.abs(pct)}%</div>`;
   }
 
+  // Global rating — always from full dataset (platform-wide live number)
+  const grVal = globalRating !== null ? globalRating.toFixed(1) : '—';
+  const grColor = globalRating===null?'var(--text3)':globalRating>=4?'#008A5C':globalRating>=3?'#16A34A':globalRating>=2?'#D97706':'#DC2626';
+  const grStars = globalRating !== null ? Math.round(globalRating) : 0;
+  const grStarsHtml = [1,2,3,4,5].map(i=>`<span style="color:${i<=grStars?grColor:'#E4E6EE'}">★</span>`).join('');
+  const grLabel = globalRating===null?'No data':globalRating>=4.5?'Excellent':globalRating>=4?'Great':globalRating>=3.5?'Good':globalRating>=3?'Average':'Poor';
+
   document.getElementById('kpi-grid').innerHTML=`
+    <div class="kpi-card kpi-global">
+      <div class="kpi-card-accent" style="background:${grColor}"></div>
+      <div class="kpi-global-score">
+        <span class="kpi-global-num" style="color:${grColor}">${grVal}</span>
+        <span class="kpi-global-denom">/ 5</span>
+      </div>
+      <div class="kpi-global-divider"></div>
+      <div class="kpi-global-stars">${grStarsHtml}</div>
+      <div class="kpi-global-divider"></div>
+      <div class="kpi-global-meta">
+        <div class="kpi-global-label">Current Trustpilot Rating</div>
+        <div class="kpi-global-title">IQ Option — Live Global Score</div>
+        <div class="kpi-global-sub">Reported by Trustpilot across all reviews on the platform</div>
+        <div class="kpi-global-badge">● ${grLabel}</div>
+      </div>
+    </div>
     <div class="kpi-card kpi-score" style="grid-column:span 2;">
       <div class="kpi-label">TrustScore (Verified)</div>
       <div class="score-ring-wrap" style="margin-top:10px;">
@@ -781,7 +848,9 @@ function updateDashboard(){
   const prev=pmk?getMonthData(ALL_DATA,pmk):null;
   _currData=curr;
   window.curr=curr;
-  renderKPIs(curr,prev,ALL_DATA);
+  // Pull most recent non-null overallRating from the full dataset
+  const globalRating = ALL_DATA.slice().reverse().find(r=>r.overallRating!==null)?.overallRating ?? null;
+  renderKPIs(curr,prev,ALL_DATA,globalRating);
   renderCharts(curr,ALL_DATA);
   renderTopicBars(curr);
   renderMatrix(curr);
