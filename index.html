@@ -5,33 +5,33 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trustpilot Intelligence · IQ Option</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg:         #F4F5F7;
-  --surface:    #FFFFFF;
-  --surface2:   #F0F1F4;
-  --surface3:   #E4E6ED;
-  --border:     rgba(0,0,0,0.08);
-  --border2:    rgba(0,0,0,0.14);
-  --text:       #12151F;
-  --text2:      #3D4460;
-  --text3:      #8A91AA;
+  --bg:         #0D0F14;
+  --surface:    #161820;
+  --surface2:   #1E2130;
+  --surface3:   #252840;
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(255,255,255,0.13);
+  --text:       #F0F2FF;
+  --text2:      #9BA3C4;
+  --text3:      #5C6480;
   --tp:         #00B67A;
-  --tp-dim:     rgba(0,182,122,0.10);
-  --tp-glow:    0 0 20px rgba(0,182,122,0.20);
-  --red:        #E8304A;
-  --red-dim:    rgba(232,48,74,0.09);
-  --amber:      #F59D12;
-  --amber-dim:  rgba(245,157,18,0.10);
-  --blue:       #2B7FE8;
-  --blue-dim:   rgba(43,127,232,0.10);
-  --shadow:     0 2px 12px rgba(0,0,0,0.08);
-  --shadow-lg:  0 8px 40px rgba(0,0,0,0.14);
+  --tp-dim:     rgba(0,182,122,0.12);
+  --tp-glow:    0 0 20px rgba(0,182,122,0.25);
+  --red:        #FF4757;
+  --red-dim:    rgba(255,71,87,0.12);
+  --amber:      #FFB142;
+  --amber-dim:  rgba(255,177,66,0.12);
+  --blue:       #4A9EFF;
+  --blue-dim:   rgba(74,158,255,0.12);
+  --shadow:     0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg:  0 8px 48px rgba(0,0,0,0.6);
   --radius:     14px;
-  --font:       'DM Sans', sans-serif;
-  --mono:       'DM Mono', monospace;
+  --font:       'Geist', sans-serif;
+  --mono:       'Geist Mono', monospace;
   --display:    'Bricolage Grotesque', sans-serif;
 }
 *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
@@ -45,7 +45,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   transition:opacity .5s;
 }
 #loader.hide { opacity:0; pointer-events:none; }
-.loader-logo { font-family:var(--display); font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--tp); margin-bottom:32px; }
+.loader-logo { font-family:var(--display); font-size:11px; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--tp); margin-bottom:32px; }
 .loader-ring { width:48px; height:48px; border-radius:50%; border:2px solid var(--border2); border-top-color:var(--tp); animation:spin .8s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .loader-status { margin-top:20px; font-size:11px; color:var(--text3); font-family:var(--mono); }
@@ -53,20 +53,19 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 /* ── TOPBAR ─────────────────────────────────────────────── */
 .topbar {
   position:sticky; top:0; z-index:200;
-  background:rgba(255,255,255,0.92); backdrop-filter:blur(20px);
+  background:rgba(13,15,20,0.92); backdrop-filter:blur(20px);
   border-bottom:1px solid var(--border);
   display:flex; align-items:center; gap:0; padding:0 32px; height:60px;
-  box-shadow:0 1px 0 rgba(0,0,0,0.05);
 }
 .topbar-logo {
   font-family:var(--display); font-size:14px; font-weight:700; letter-spacing:.2px;
   display:flex; align-items:center; gap:10px; margin-right:32px; padding-right:28px;
-  border-right:1px solid var(--border); color:var(--text);
+  border-right:1px solid var(--border);
 }
 .tp-star-badge {
   width:28px; height:28px; background:var(--tp); border-radius:6px;
   display:flex; align-items:center; justify-content:center;
-  font-size:14px; color:#fff; font-weight:800;
+  font-size:14px; color:#000; font-weight:800;
 }
 .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
 .month-select-wrap {
@@ -78,13 +77,13 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   font-family:var(--font); font-weight:600; cursor:pointer; outline:none;
   appearance:none; -webkit-appearance:none; padding-right:16px;
 }
-.month-select-wrap select option { background:#fff; }
+.month-select-wrap select option { background:#161820; }
 .refresh-btn {
   background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
   padding:7px 14px; color:var(--text2); font-size:11px; font-family:var(--font);
   font-weight:600; cursor:pointer; transition:all .2s;
 }
-.refresh-btn:hover { color:var(--tp); border-color:var(--tp); background:var(--tp-dim); }
+.refresh-btn:hover { color:var(--tp); border-color:var(--tp); }
 .data-badge { font-size:10px; color:var(--text3); font-family:var(--mono); }
 
 /* ── LAYOUT ─────────────────────────────────────────────── */
@@ -98,8 +97,8 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 }
 .section-hd:first-child { margin-top:0; }
 .section-label {
-  font-family:var(--font); font-size:10px; font-weight:700; letter-spacing:2px;
-  text-transform:uppercase; color:var(--text3); white-space:nowrap;
+  font-family:var(--font); font-size:10px; font-weight:600; letter-spacing:2px;
+  text-transform:uppercase; color:var(--text3);
 }
 .section-hd::after { content:''; flex:1; height:1px; background:var(--border); }
 
@@ -108,11 +107,10 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 .kpi-card {
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
   padding:20px 18px 16px; position:relative; overflow:hidden;
-  transition:border-color .2s, transform .2s, box-shadow .2s;
-  box-shadow:var(--shadow);
+  transition:border-color .2s, transform .2s;
 }
-.kpi-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,0.12); }
-.kpi-card-accent { position:absolute; top:0; left:0; right:0; height:3px; }
+.kpi-card:hover { border-color:var(--border2); transform:translateY(-1px); }
+.kpi-card-accent { position:absolute; top:0; left:0; right:0; height:2px; }
 .kpi-label { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
 .kpi-value { font-family:var(--display); font-size:28px; font-weight:800; line-height:1; margin-bottom:8px; letter-spacing:-1px; }
 .kpi-sub { font-size:10px; color:var(--text3); font-family:var(--mono); }
@@ -121,51 +119,15 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   font-size:10px; font-weight:700; padding:2px 7px; border-radius:20px;
   font-family:var(--mono); margin-top:4px;
 }
-.delta-up { background:rgba(0,182,122,.12); color:#009961; }
-.delta-dn { background:rgba(232,48,74,.10); color:var(--red); }
-.delta-nt { background:var(--surface2); color:var(--text3); }
+.delta-up { background:rgba(0,182,122,.15); color:var(--tp); }
+.delta-dn { background:rgba(255,71,87,.15); color:var(--red); }
+.delta-nt { background:rgba(255,255,255,.06); color:var(--text3); }
 
-/* ── OVERALL RATING CARD — spans full row ─────────────────── */
-.kpi-overall {
-  grid-column: span 6;
-  background: linear-gradient(135deg, #eafaf4 0%, #f5fdf9 50%, #fff 100%);
-  border-color: rgba(0,182,122,0.30);
-  padding: 24px 28px;
-}
-.overall-inner { display:flex; align-items:center; gap:32px; flex-wrap:wrap; }
-.overall-score-wrap { display:flex; align-items:baseline; gap:8px; }
-.overall-score-num {
-  font-family:var(--display); font-size:56px; font-weight:800;
-  color:var(--tp); line-height:1; letter-spacing:-3px;
-}
-.overall-score-denom { font-family:var(--display); font-size:22px; font-weight:600; color:var(--text3); }
-.overall-stars { display:flex; gap:4px; margin-top:6px; }
-.overall-star { font-size:22px; }
-.overall-divider { width:1px; height:60px; background:var(--border2); flex-shrink:0; }
-.overall-meta { display:flex; flex-direction:column; gap:4px; }
-.overall-meta-label { font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); }
-.overall-meta-val { font-family:var(--display); font-size:18px; font-weight:700; color:var(--text); }
-.overall-meta-sub { font-size:10px; color:var(--text3); font-family:var(--mono); }
-.overall-bar-section { flex:1; min-width:240px; }
-.overall-bar-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
-.obar-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
-.obar-label { font-size:10px; color:var(--text2); font-family:var(--mono); width:14px; text-align:right; font-weight:600; }
-.obar-track { flex:1; background:var(--surface3); border-radius:3px; height:7px; overflow:hidden; }
-.obar-fill { height:100%; border-radius:3px; transition:width .7s cubic-bezier(.4,0,.2,1); }
-.obar-count { font-size:10px; color:var(--text3); font-family:var(--mono); width:20px; text-align:right; }
-.tp-badge-link {
-  display:inline-flex; align-items:center; gap:6px;
-  background:var(--tp); color:#fff; border-radius:8px;
-  padding:8px 16px; font-size:11px; font-weight:700;
-  text-decoration:none; transition:opacity .15s; margin-top:8px;
-}
-.tp-badge-link:hover { opacity:.85; }
-
-/* SCORE CARD — 2-col span */
+/* TRUST SCORE CARD — special */
 .kpi-score {
   grid-column: span 2;
-  background: linear-gradient(135deg, #f0faf6 0%, #fafffe 100%);
-  border-color:rgba(0,182,122,.22);
+  background:linear-gradient(135deg, #0a2a1e 0%, #0f1a14 100%);
+  border-color:rgba(0,182,122,.25);
 }
 .score-ring-wrap { display:flex; align-items:center; gap:20px; }
 .score-ring { position:relative; width:72px; height:72px; flex-shrink:0; }
@@ -183,10 +145,21 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 .star-bar-fill { height:100%; border-radius:2px; transition:width .6s ease; }
 .star-bar-count { font-size:10px; color:var(--text3); font-family:var(--mono); width:18px; text-align:right; flex-shrink:0; }
 
-/* ── CHARTS ──────────────────────────────────────────────── */
+/* ── RESPONSE TIME SECTION ───────────────────────────────── */
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 18px;
+}
+
+/* Response time distribution chart */
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px 18px;
+}
+
+/* ── CHARTS ROW ──────────────────────────────────────────── */
+/* charts-row replaced with inline grid */
 .chart-card {
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-  padding:20px 18px; box-shadow:var(--shadow);
+  padding:20px 18px;
 }
 .chart-card-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:16px; }
 .chart-wrap { height:200px; position:relative; }
@@ -194,7 +167,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 /* ── MATRIX ──────────────────────────────────────────────── */
 .matrix-card {
   background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
-  padding:24px; overflow-x:auto; box-shadow:var(--shadow);
+  padding:24px; overflow-x:auto;
 }
 .matrix-card-title { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--text3); margin-bottom:20px; }
 .matrix-table { width:100%; border-collapse:separate; border-spacing:5px; }
@@ -222,20 +195,21 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 .topic-bar-row:hover { background:var(--surface2); }
 .topic-bar-name { font-size:12px; font-weight:500; color:var(--text); width:140px; flex-shrink:0; }
 .topic-bar-track { flex:1; background:var(--surface3); border-radius:3px; height:8px; overflow:hidden; }
+.topic-bar-fill-pos { height:100%; border-radius:3px; background:var(--tp); float:left; }
 .topic-bar-fill-neg { height:100%; border-radius:3px; background:var(--red); float:left; }
 .topic-bar-fill-mix { height:100%; border-radius:3px; background:var(--amber); float:left; }
-.topic-bar-fill-pos { height:100%; border-radius:3px; background:var(--tp); float:left; }
 .topic-bar-count { font-size:11px; font-weight:700; color:var(--text); font-family:var(--mono); width:26px; text-align:right; }
+.topic-bar-pct { font-size:10px; color:var(--text3); font-family:var(--mono); width:34px; text-align:right; }
 .topic-bar-arrow { color:var(--text3); }
 
-/* ── SOURCE PILLS ────────────────────────────────────────── */
+/* ── SOURCE BREAKDOWN ────────────────────────────────────── */
 .source-pills { display:flex; gap:8px; flex-wrap:wrap; }
 .source-pill {
-  background:var(--surface); border:1px solid var(--border); border-radius:8px;
+  background:var(--surface2); border:1px solid var(--border2); border-radius:8px;
   padding:10px 16px; display:flex; align-items:center; gap:10px; flex:1; min-width:120px;
-  cursor:pointer; transition:all .15s; box-shadow:var(--shadow);
+  cursor:pointer; transition:all .15s;
 }
-.source-pill:hover { border-color:var(--tp); background:var(--tp-dim); }
+.source-pill:hover { border-color:var(--tp); }
 .source-pill-name { font-size:11px; font-weight:600; color:var(--text2); }
 .source-pill-val { font-family:var(--display); font-size:18px; font-weight:800; color:var(--text); margin-left:auto; }
 .source-pill-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
@@ -243,7 +217,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 /* ── MODAL ───────────────────────────────────────────────── */
 .overlay {
   display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,.45); z-index:400;
+  background:rgba(0,0,0,.75); z-index:400;
   align-items:center; justify-content:center; backdrop-filter:blur(8px);
 }
 .overlay.open { display:flex; }
@@ -267,14 +241,13 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   font-size:16px; color:var(--text2); transition:all .15s;
 }
 .modal-close:hover { background:var(--surface3); color:var(--text); }
-.modal-body { flex:1; overflow-y:auto; padding:0; background:var(--bg); }
+.modal-body { flex:1; overflow-y:auto; padding:0; }
 .modal-content { padding:16px 24px 24px; }
 
 /* Review cards */
 .review-card {
-  background:var(--surface); border:1px solid var(--border); border-radius:10px;
+  background:var(--surface2); border:1px solid var(--border); border-radius:10px;
   padding:16px; margin-bottom:10px; position:relative;
-  box-shadow:0 1px 4px rgba(0,0,0,0.05);
 }
 .review-card:last-child { margin-bottom:0; }
 .review-card-top { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:10px; gap:12px; }
@@ -283,18 +256,18 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 .star-empty  { color:var(--surface3); font-size:14px; }
 .review-badges { display:flex; gap:6px; flex-wrap:wrap; flex:1; }
 .rbadge { font-size:9px; font-weight:700; padding:2px 7px; border-radius:4px; text-transform:uppercase; letter-spacing:.5px; }
-.rbadge-score  { background:var(--tp-dim); color:#007a52; border:1px solid rgba(0,182,122,.25); }
+.rbadge-score  { background:var(--tp-dim); color:var(--tp); border:1px solid rgba(0,182,122,.25); }
 .rbadge-muted  { background:var(--surface3); color:var(--text3); }
-.rbadge-replied{ background:var(--tp-dim); color:#007a52; }
-.rbadge-pending{ background:var(--red-dim); color:var(--red); }
+.rbadge-replied{ background:var(--tp-dim); color:var(--tp); }
+.rbadge-pending{ background:rgba(255,71,87,.1); color:var(--red); }
 .rbadge-source { background:var(--blue-dim); color:var(--blue); }
-.rbadge-lang   { background:var(--surface2); color:var(--text2); }
+.rbadge-lang   { background:var(--surface3); color:var(--text2); }
 .review-text { font-size:12.5px; color:var(--text2); line-height:1.65; font-style:italic; margin-bottom:10px; }
 .review-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
 .review-meta { font-size:10px; color:var(--text3); font-family:var(--mono); }
 .review-link {
   font-size:10px; font-weight:700; color:var(--tp); text-decoration:none;
-  border:1px solid rgba(0,182,122,.35); border-radius:5px; padding:3px 10px;
+  border:1px solid rgba(0,182,122,.3); border-radius:5px; padding:3px 10px;
   transition:all .15s;
 }
 .review-link:hover { background:var(--tp-dim); }
@@ -309,6 +282,13 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 }
 .load-more-btn:hover { background:var(--tp-dim); border-color:var(--tp); }
 
+/* Breadcrumb */
+.modal-bc { display:flex; align-items:center; gap:6px; margin-bottom:14px; flex-wrap:wrap; }
+.bc-item { font-size:10px; color:var(--text3); cursor:pointer; font-family:var(--mono); }
+.bc-item:hover { color:var(--tp); }
+.bc-item.cur { color:var(--text); font-weight:600; cursor:default; }
+.bc-sep { font-size:10px; color:var(--text3); }
+
 /* Count chip */
 .count-chip {
   display:inline-flex; align-items:center; gap:6px;
@@ -321,7 +301,7 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 @media(max-width:900px){
   .kpi-grid { grid-template-columns:1fr 1fr; }
   .kpi-score { grid-column:span 2; }
-  .kpi-overall { grid-column:span 2; }
+  .resp-grid { grid-template-columns:1fr 1fr; }
   .container { padding:16px 16px 60px; }
 }
 </style>
@@ -355,12 +335,16 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
   <div class="section-hd" style="margin-top:0;"><div class="section-label">Overview</div></div>
   <div class="kpi-grid" id="kpi-grid"></div>
 
+
+
   <!-- Charts Row -->
   <div class="section-hd"><div class="section-label">Breakdown</div></div>
+  <!-- Trend chart: full width -->
   <div class="chart-card" style="margin-bottom:12px;">
     <div class="chart-card-title">Reviews Over Time</div>
     <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
   </div>
+  <!-- Donuts: side by side -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
     <div class="chart-card">
       <div class="chart-card-title">Sentiment Split</div>
@@ -414,27 +398,29 @@ const CSV_URL  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?form
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const STAR_COLORS = {
-  1:'#E8304A', 2:'#F07A30', 3:'#F59D12', 4:'#7BDA9F', 5:'#00B67A'
+  1: '#FF4757', 2: '#FF7F50', 3: '#FFB142', 4: '#7BED9F', 5: '#00B67A'
 };
-const SOURCE_COLORS  = { Organic:'#2B7FE8', InvitationLinkApi:'#00B67A', AFSv2:'#F59D12' };
-const SOURCE_LABELS  = { Organic:'Organic', InvitationLinkApi:'Invited', AFSv2:'AFS' };
+const SENT_COLORS = { Positive:'#00B67A', Negative:'#FF4757', Mixed:'#FFB142' };
+const SOURCE_COLORS = { Organic:'#4A9EFF', InvitationLinkApi:'#00B67A', AFSv2:'#FFB142' };
+const SOURCE_LABELS = { Organic:'Organic', InvitationLinkApi:'Invited', AFSv2:'AFS' };
 
 let ALL_DATA = [];
 let CHART_INSTANCES = {};
 let currentMonth = '';
-let _modalRows=[], _modalPage=1;
+let drillData  = [];  // for pagination
+let drillPage  = 1;
 const PAGE_SIZE = 30;
 
 // ═══════════════════════════════════════════════════════════
 //  RFC 4180 CSV PARSER
 // ═══════════════════════════════════════════════════════════
 function parseCSV(text){
-  const rows=[[]]; let cursor=0, col=0, inQ=false;
+  const rows = [[]]; let cursor=0, col=0, inQ=false;
   if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
   while(cursor<text.length){
     const c=text[cursor], n=text[cursor+1];
     if(inQ){
-      if(c==='"'&&n==='"'){rows[rows.length-1][col]=(rows[rows.length-1][col]||'')+'"';cursor++;}
+      if(c==='"'&&n==='"'){ rows[rows.length-1][col]=(rows[rows.length-1][col]||'')+'"'; cursor++; }
       else if(c==='"') inQ=false;
       else rows[rows.length-1][col]=(rows[rows.length-1][col]||'')+c;
     } else {
@@ -442,11 +428,11 @@ function parseCSV(text){
       else if(c===','){col++;rows[rows.length-1][col]='';}
       else if(c==='\r'&&n==='\n'){rows.push([]);col=0;cursor++;}
       else if(c==='\n'||c==='\r'){rows.push([]);col=0;}
-      else{if(rows[rows.length-1][col]===undefined) rows[rows.length-1][col]=''; rows[rows.length-1][col]+=c;}
+      else{ if(rows[rows.length-1][col]===undefined) rows[rows.length-1][col]=''; rows[rows.length-1][col]+=c; }
     }
     cursor++;
   }
-  const hdrs=rows[0].map(h=>h.trim());
+  const hdrs = rows[0].map(h=>h.trim());
   return rows.slice(1).filter(r=>r.length>2&&r.some(v=>v)).map(row=>{
     const obj={};
     hdrs.forEach((h,i)=>{ obj[h]=(row[i]||'').trim(); });
@@ -472,14 +458,6 @@ async function fetchData(){
 }
 
 function processCSV(rows){
-  // Extract the overall Trustpilot rating (first non-empty value in 'Overall rating' column)
-  let overallRating = null;
-  for(const r of rows){
-    const v = parseFloat(r['Overall rating']);
-    if(!isNaN(v)){ overallRating = v; break; }
-  }
-  window._OVERALL_RATING = overallRating;
-
   return rows.map(r=>{
     const dateStr = r['Date']||'';
     const d = new Date(dateStr);
@@ -537,9 +515,9 @@ function makeDonut(id, labels, vals, colors){
     type:'doughnut',
     data:{labels,datasets:[{data:vals,backgroundColor:colors,borderWidth:0,hoverOffset:6}]},
     options:{
-      responsive:true, maintainAspectRatio:false, cutout:'68%',
+      responsive:true,maintainAspectRatio:false,cutout:'68%',
       plugins:{
-        legend:{position:'right',labels:{color:'#3D4460',font:{family:'DM Sans',size:11},padding:10,boxWidth:10}},
+        legend:{position:'right',labels:{color:'#9BA3C4',font:{family:'DM Sans',size:11},padding:10,boxWidth:10}},
         tooltip:{callbacks:{label:c=>` ${c.label}: ${c.raw} (${((c.raw/vals.reduce((a,b)=>a+b,0))*100).toFixed(1)}%)`}}
       }
     }
@@ -549,10 +527,12 @@ function makeDonut(id, labels, vals, colors){
 function makeTrendChart(id, allData){
   destroyChart(id);
   const ctx=document.getElementById(id); if(!ctx) return;
+  // Build weekly buckets for ALL data
   const weeks={};
   allData.forEach(r=>{
     const d=new Date(r.dateRaw);
     if(isNaN(d)) return;
+    // Round to Monday
     const day=d.getDay(), diff=d.getDate()-day+(day===0?-6:1);
     const monday=new Date(d); monday.setDate(diff); monday.setHours(0,0,0,0);
     const wk=monday.toISOString().slice(0,10);
@@ -568,19 +548,16 @@ function makeTrendChart(id, allData){
       labels,
       datasets:[
         {label:'Positive',data:labels.map(w=>weeks[w].pos),backgroundColor:'#00B67A',borderRadius:3,borderSkipped:false},
-        {label:'Mixed',   data:labels.map(w=>weeks[w].mix),backgroundColor:'#F59D12',borderRadius:3,borderSkipped:false},
-        {label:'Negative',data:labels.map(w=>weeks[w].neg),backgroundColor:'#E8304A',borderRadius:3,borderSkipped:false},
+        {label:'Mixed',   data:labels.map(w=>weeks[w].mix),backgroundColor:'#FFB142',borderRadius:3,borderSkipped:false},
+        {label:'Negative',data:labels.map(w=>weeks[w].neg),backgroundColor:'#FF4757',borderRadius:3,borderSkipped:false},
       ]
     },
     options:{
-      responsive:true, maintainAspectRatio:false,
-      plugins:{
-        legend:{labels:{color:'#3D4460',font:{family:'DM Sans',size:10},padding:8,boxWidth:8}},
-        tooltip:{mode:'index',intersect:false}
-      },
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{labels:{color:'#9BA3C4',font:{family:'DM Sans',size:10},padding:8,boxWidth:8}},tooltip:{mode:'index',intersect:false}},
       scales:{
-        x:{stacked:true,ticks:{color:'#8A91AA',font:{family:'DM Mono',size:9}},grid:{display:false}},
-        y:{stacked:true,ticks:{color:'#8A91AA',font:{family:'DM Mono',size:9}},grid:{color:'rgba(0,0,0,0.05)'}}
+        x:{stacked:true,ticks:{color:'#5C6480',font:{family:'DM Mono',size:9}},grid:{display:false}},
+        y:{stacked:true,ticks:{color:'#5C6480',font:{family:'DM Mono',size:9}},grid:{color:'rgba(255,255,255,0.04)'}}
       }
     }
   });
@@ -589,87 +566,6 @@ function makeTrendChart(id, allData){
 // ═══════════════════════════════════════════════════════════
 //  RENDER FUNCTIONS
 // ═══════════════════════════════════════════════════════════
-
-function renderOverallCard(allData){
-  const overallRating = window._OVERALL_RATING;
-  const scoreR = allData.filter(r=>r.countForScore);
-  const starCounts=[1,2,3,4,5].map(s=>scoreR.filter(r=>r.stars===s).length);
-  const maxStar=Math.max(...starCounts,1);
-  const totalReviews = allData.length;
-  const displayRating = overallRating !== null ? overallRating : (
-    scoreR.length ? (scoreR.reduce((s,r)=>s+r.stars,0)/scoreR.length) : 0
-  );
-
-  // Render Trustpilot-style stars (full, half logic simplified)
-  function starHtml(rating){
-    let html='';
-    for(let i=1;i<=5;i++){
-      if(rating >= i) html+=`<span class="overall-star" style="color:var(--tp)">★</span>`;
-      else if(rating >= i-0.5) html+=`<span class="overall-star" style="color:var(--tp)">★</span>`;
-      else html+=`<span class="overall-star" style="color:var(--surface3)">★</span>`;
-    }
-    return html;
-  }
-
-  // Find earliest and latest dates
-  const dates = allData.map(r=>new Date(r.dateRaw)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
-  const dateRange = dates.length>=2
-    ? `${dates[0].toLocaleDateString('en-GB',{month:'short',year:'numeric'})} – ${dates[dates.length-1].toLocaleDateString('en-GB',{month:'short',year:'numeric'})}`
-    : '';
-
-  return `
-    <div class="kpi-card kpi-overall">
-      <div class="kpi-card-accent" style="background:linear-gradient(90deg,var(--tp),#7BDA9F)"></div>
-      <div class="kpi-label" style="margin-bottom:16px;">Trustpilot Overall Rating</div>
-      <div class="overall-inner">
-
-        <div>
-          <div class="overall-score-wrap">
-            <span class="overall-score-num">${displayRating.toFixed(1)}</span>
-            <span class="overall-score-denom">/ 5</span>
-          </div>
-          <div class="overall-stars">${starHtml(displayRating)}</div>
-          <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px;">${dateRange}</div>
-        </div>
-
-        <div class="overall-divider"></div>
-
-        <div class="overall-meta">
-          <div class="overall-meta-label">Total Reviews</div>
-          <div class="overall-meta-val">${totalReviews.toLocaleString()}</div>
-          <div class="overall-meta-sub">in database</div>
-        </div>
-
-        <div class="overall-divider"></div>
-
-        <div class="overall-meta">
-          <div class="overall-meta-label">Verified Reviews</div>
-          <div class="overall-meta-val">${scoreR.length.toLocaleString()}</div>
-          <div class="overall-meta-sub">count for score</div>
-        </div>
-
-        <div class="overall-divider"></div>
-
-        <div class="overall-bar-section">
-          <div class="overall-bar-title">Star Distribution</div>
-          ${[5,4,3,2,1].map(s=>`
-            <div class="obar-row">
-              <span class="obar-label" style="color:${STAR_COLORS[s]}">${s}</span>
-              <div class="obar-track"><div class="obar-fill" style="width:${(starCounts[s-1]/maxStar*100).toFixed(0)}%;background:${STAR_COLORS[s]}"></div></div>
-              <span class="obar-count">${starCounts[s-1]}</span>
-            </div>`).join('')}
-        </div>
-
-        <div>
-          <a href="https://www.trustpilot.com" target="_blank" rel="noopener" class="tp-badge-link">
-            ★ View on Trustpilot
-          </a>
-        </div>
-
-      </div>
-    </div>`;
-}
-
 function renderKPIs(curr, prev, allData){
   const scoreR = curr.filter(r=>r.countForScore);
   const avgScore = scoreR.length ? (scoreR.reduce((s,r)=>s+r.stars,0)/scoreR.length) : 0;
@@ -682,16 +578,24 @@ function renderKPIs(curr, prev, allData){
   const mix=curr.filter(r=>r.sentiment==='Mixed').length;
   const replied=curr.filter(r=>r.fixed).length;
   const replyRate=total>0?((replied/total)*100).toFixed(0):0;
+  // Avg response time for KPI card
   const withResp=curr.filter(r=>r.responseTime!==null&&r.responseTime>=0);
-  const avgResp=withResp.length?(withResp.reduce((s,r)=>s+r.responseTime,0)/withResp.length):null;
+  const withRespCount=withResp.length;
+  const avgResp=withRespCount?(withResp.reduce((s,r)=>s+r.responseTime,0)/withRespCount):null;
   const sortedResp=[...withResp.map(r=>r.responseTime)].sort((a,b)=>a-b);
   const medResp=sortedResp.length?sortedResp[Math.floor(sortedResp.length/2)]:null;
+  const avgRespStr=fmtHours(avgResp);
+  const medRespStr=fmtHours(medResp);
   const avgRespColor=avgResp===null?'var(--text3)':avgResp<24?'var(--tp)':avgResp<72?'var(--amber)':'var(--red)';
+
+  // Star distribution for ring chart
   const starCounts=[1,2,3,4,5].map(s=>scoreR.filter(r=>r.stars===s).length);
   const maxStar=Math.max(...starCounts,1);
+
+  // Build ring SVG
   const R=30,cx=36,cy=36,circ=2*Math.PI*R;
   const dash=(avgScore/5)*circ;
-  const ringColor=avgScore>=4?'#00B67A':avgScore>=3?'#7BDA9F':avgScore>=2?'#F59D12':'#E8304A';
+  const ringColor=avgScore>=4?'#00B67A':avgScore>=3?'#7BED9F':avgScore>=2?'#FFB142':'#FF4757';
 
   function delta(curr,prev,good='up'){
     if(prev===null||prev===0) return '';
@@ -700,16 +604,13 @@ function renderKPIs(curr, prev, allData){
     return `<div class="kpi-delta ${cls}">${isUp?'▲':'▼'} ${Math.abs(pct)}%</div>`;
   }
 
-  const overallCard = renderOverallCard(allData);
-
-  document.getElementById('kpi-grid').innerHTML = overallCard + `
+  document.getElementById('kpi-grid').innerHTML=`
     <div class="kpi-card kpi-score" style="grid-column:span 2;">
-      <div class="kpi-card-accent" style="background:var(--tp)"></div>
-      <div class="kpi-label">TrustScore (Period)</div>
+      <div class="kpi-label">TrustScore (Verified)</div>
       <div class="score-ring-wrap" style="margin-top:10px;">
         <div class="score-ring">
           <svg width="72" height="72" viewBox="0 0 72 72">
-            <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(0,0,0,0.07)" stroke-width="6"/>
+            <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="6"/>
             <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${ringColor}" stroke-width="6"
               stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
           </svg>
@@ -732,30 +633,30 @@ function renderKPIs(curr, prev, allData){
     </div>
 
     <div class="kpi-card">
-      <div class="kpi-card-accent" style="background:var(--tp)"></div>
+      <div class="kpi-card-accent" style="background:#00B67A"></div>
       <div class="kpi-label">Total Reviews</div>
       <div class="kpi-value">${total}</div>
       ${delta(total,prevTotal,'up')}
     </div>
-    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Positive Reviews',window.curr.filter(r=>r.sentiment==='Positive'))">
-      <div class="kpi-card-accent" style="background:var(--tp)"></div>
+    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Positive Reviews',curr.filter(r=>r.sentiment==='Positive'))">
+      <div class="kpi-card-accent" style="background:#00B67A"></div>
       <div class="kpi-label">Positive</div>
       <div class="kpi-value" style="color:var(--tp)">${pos}</div>
       <div class="kpi-sub">${total>0?((pos/total)*100).toFixed(0):0}% of total</div>
     </div>
-    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Negative Reviews',window.curr.filter(r=>r.sentiment==='Negative'))">
+    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Negative Reviews',curr.filter(r=>r.sentiment==='Negative'))">
       <div class="kpi-card-accent" style="background:var(--red)"></div>
       <div class="kpi-label">Negative</div>
       <div class="kpi-value" style="color:var(--red)">${neg}</div>
       <div class="kpi-sub">${total>0?((neg/total)*100).toFixed(0):0}% of total</div>
     </div>
-    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Mixed Reviews',window.curr.filter(r=>r.sentiment==='Mixed'))">
+    <div class="kpi-card" style="cursor:pointer" onclick="openReviewModal('Mixed Reviews',curr.filter(r=>r.sentiment==='Mixed'))">
       <div class="kpi-card-accent" style="background:var(--amber)"></div>
       <div class="kpi-label">Mixed</div>
       <div class="kpi-value" style="color:var(--amber)">${mix}</div>
       <div class="kpi-sub">${total>0?((mix/total)*100).toFixed(0):0}% of total</div>
     </div>
-    <div class="kpi-card" onclick="openReviewModal('Replied Reviews',window.curr.filter(r=>r.fixed))" style="cursor:pointer;grid-column:span 3;">
+    <div class="kpi-card" onclick="openReviewModal('Replied Reviews',curr.filter(r=>r.fixed))" style="cursor:pointer;grid-column:span 3;">
       <div class="kpi-card-accent" style="background:var(--blue)"></div>
       <div class="kpi-label">ORM Replied</div>
       <div class="kpi-value" style="color:var(--blue)">${replied}</div>
@@ -764,22 +665,28 @@ function renderKPIs(curr, prev, allData){
     <div class="kpi-card" style="grid-column:span 3;">
       <div class="kpi-card-accent" style="background:${avgRespColor}"></div>
       <div class="kpi-label">Avg Response Time</div>
-      <div class="kpi-value" style="font-size:22px;color:${avgRespColor}">${fmtHours(avgResp)}</div>
-      <div class="kpi-sub">${fmtHours(medResp)} median · ${withResp.length} reviews</div>
+      <div class="kpi-value" style="font-size:22px;color:${avgRespColor}">${avgRespStr}</div>
+      <div class="kpi-sub">${medRespStr} median · ${withRespCount} reviews</div>
     </div>
   `;
 }
 
+
 function renderCharts(curr, allData){
+  // Trend: use all data for context, highlight current month
   makeTrendChart('chart-trend', allData);
+
+  // Sentiment donut
   const pos=curr.filter(r=>r.sentiment==='Positive').length;
   const neg=curr.filter(r=>r.sentiment==='Negative').length;
   const mix=curr.filter(r=>r.sentiment==='Mixed').length;
-  makeDonut('chart-sentiment',['Positive','Negative','Mixed'],[pos,neg,mix],['#00B67A','#E8304A','#F59D12']);
+  makeDonut('chart-sentiment',['Positive','Negative','Mixed'],[pos,neg,mix],['#00B67A','#FF4757','#FFB142']);
+
+  // Source donut
   const sources={};
   curr.forEach(r=>sources[r.source]=(sources[r.source]||0)+1);
   const sKeys=Object.keys(sources);
-  makeDonut('chart-source',sKeys.map(s=>SOURCE_LABELS[s]||s),sKeys.map(s=>sources[s]),sKeys.map(s=>SOURCE_COLORS[s]||'#2B7FE8'));
+  makeDonut('chart-source',sKeys.map(s=>SOURCE_LABELS[s]||s),sKeys.map(s=>sources[s]),sKeys.map(s=>SOURCE_COLORS[s]||'#4A9EFF'));
 }
 
 function renderTopicBars(curr){
@@ -793,11 +700,12 @@ function renderTopicBars(curr){
   });
   const sorted=Object.entries(topics).sort((a,b)=>b[1].total-a[1].total);
   const maxT=sorted[0]?sorted[0][1].total:1;
-  document.getElementById('topic-bars').innerHTML=`<div class="topic-bars">${sorted.map(([t,v])=>{
+  const el=document.getElementById('topic-bars');
+  el.innerHTML=`<div class="topic-bars">${sorted.map(([t,v])=>{
     const pw=((v.pos/maxT)*100).toFixed(0);
     const nw=((v.neg/maxT)*100).toFixed(0);
     const mw=((v.mix/maxT)*100).toFixed(0);
-    return `<div class="topic-bar-row" onclick="openReviewModal('Topic: ${t}', window.curr.filter(r=>r.topic===${JSON.stringify(t)}))">
+    return `<div class="topic-bar-row" onclick="openReviewModal('Topic: ${t}', curr.filter(r=>r.topic==='${t}'))">
       <span class="topic-bar-name">${t}</span>
       <div class="topic-bar-track">
         <div class="topic-bar-fill-neg" style="width:${nw}%"></div>
@@ -814,6 +722,7 @@ function renderMatrix(curr){
   const topics=[...new Set(curr.map(r=>r.topic))].sort();
   const langs=[...new Set(curr.map(r=>r.language))].sort();
   const LANG_NAMES={'en':'EN','es':'ES','pt':'PT','fr':'FR','de':'DE','th':'TH','my':'MY'};
+  // Colour by sentiment majority for that cell
   const table=document.getElementById('topic-matrix');
   let html=`<thead><tr><th></th>`;
   langs.forEach(l=>html+=`<th class="matrix-col-header">${LANG_NAMES[l]||l.toUpperCase()}</th>`);
@@ -826,14 +735,15 @@ function renderMatrix(curr){
       if(cnt===0){
         html+=`<td class="matrix-cell matrix-cell-zero">·</td>`;
       } else {
+        // Colour by dominant sentiment
         const neg=matches.filter(r=>r.sentiment==='Negative').length;
         const pos=matches.filter(r=>r.sentiment==='Positive').length;
         const mix=matches.filter(r=>r.sentiment==='Mixed').length;
         const dom=neg>=pos&&neg>=mix?'neg':pos>=mix?'pos':'mix';
-        const col=dom==='neg'?'232,48,74':dom==='pos'?'0,182,122':'245,157,18';
-        const opacity=0.10+(cnt/10)*0.55;
-        html+=`<td class="matrix-cell" style="background:rgba(${col},${Math.min(opacity,0.82)});color:rgb(${dom==='neg'?'180,20,40':dom==='pos'?'0,130,88':'180,110,0'});"
-          onclick="openReviewModal('${t} · ${(LANG_NAMES[l]||l.toUpperCase())}', window.curr.filter(r=>r.topic===${JSON.stringify(t)}&&r.language===${JSON.stringify(l)))}">${cnt}</td>`;
+        const col=dom==='neg'?'255,71,87':dom==='pos'?'0,182,122':'255,177,66';
+        const opacity=0.12+(cnt/10)*0.65;
+        html+=`<td class="matrix-cell" style="background:rgba(${col},${Math.min(opacity,0.88)});color:rgb(${col});"
+          onclick="openReviewModal('${t} · ${(LANG_NAMES[l]||l.toUpperCase())}', curr.filter(r=>r.topic==='${t}'&&r.language==='${l}'))">${cnt}</td>`;
       }
     });
     html+=`</tr>`;
@@ -846,9 +756,9 @@ function renderLangPills(curr){
   curr.forEach(r=>langs[r.language]=(langs[r.language]||0)+1);
   const sorted=Object.entries(langs).sort((a,b)=>b[1]-a[1]);
   const langNames={'en':'English','es':'Spanish','pt':'Portuguese','fr':'French','de':'German','th':'Thai','my':'Malay'};
-  const langColors=['#00B67A','#2B7FE8','#F59D12','#E8304A','#9B59B6','#7BDA9F','#E96B6B'];
+  const langColors=['#00B67A','#4A9EFF','#FFB142','#FF4757','#C471ED','#7BED9F','#FF6B9D'];
   document.getElementById('lang-pills').innerHTML=sorted.map(([l,cnt],i)=>`
-    <div class="source-pill" onclick="openReviewModal('Language: ${langNames[l]||l.toUpperCase()}', window.curr.filter(r=>r.language===${JSON.stringify(l)}))">
+    <div class="source-pill" onclick="openReviewModal('Language: ${langNames[l]||l.toUpperCase()}', curr.filter(r=>r.language==='${l}'))">
       <div class="source-pill-dot" style="background:${langColors[i%langColors.length]}"></div>
       <div>
         <div class="source-pill-name">${langNames[l]||l.toUpperCase()}</div>
@@ -861,6 +771,9 @@ function renderLangPills(curr){
 // ═══════════════════════════════════════════════════════════
 //  REVIEW MODAL
 // ═══════════════════════════════════════════════════════════
+// Store for pagination — expose globally
+let _modalRows=[], _modalPage=1;
+
 function openReviewModal(title, rows){
   _modalRows=[...rows].sort((a,b)=>new Date(b.dateRaw)-new Date(a.dateRaw));
   _modalPage=1;
@@ -896,6 +809,7 @@ function reviewCardHtml(r){
   const starsHtml=r.stars>0?`<div class="review-stars">${
     Array.from(stars).map(s=>s==='★'?`<span class="star-filled">★</span>`:`<span class="star-empty">☆</span>`).join('')
   }</div>`:'';
+  const respStr=r.responseTime!==null?fmtHours(r.responseTime):null;
   const truncated=r.content.length>350?r.content.slice(0,350)+'…':r.content;
   const dateLabel=r.dateRaw?new Date(r.dateRaw).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}):'';
   return `<div class="review-card">
@@ -912,7 +826,7 @@ function reviewCardHtml(r){
     <div class="review-footer">
       <div>
         <div class="review-meta">📅 ${dateLabel}${r.topic?' · '+r.topic:''}</div>
-        ${r.responseTime!==null?`<div class="review-resp-time" style="margin-top:3px;">⏱ Replied in ${fmtHours(r.responseTime)}</div>`:''}
+        ${respStr?`<div class="review-resp-time" style="margin-top:3px;">⏱ Replied in ${respStr}</div>`:''}
       </div>
       ${r.link?`<a href="${r.link}" target="_blank" rel="noopener" class="review-link">View on Trustpilot ↗</a>`:''}
     </div>
@@ -924,12 +838,19 @@ function closeModal(){ document.getElementById('overlay').classList.remove('open
 // ═══════════════════════════════════════════════════════════
 //  MAIN UPDATE
 // ═══════════════════════════════════════════════════════════
+
+// Expose curr to onclick handlers in topic bars/matrix
+let _currData=[];
+
 function updateDashboard(){
   const mk=document.getElementById('month-select').value;
   currentMonth=mk;
   const curr=getMonthData(ALL_DATA,mk);
   const pmk=getPrevMonth(mk);
   const prev=pmk?getMonthData(ALL_DATA,pmk):null;
+  _currData=curr;
+
+  // Patch onclick references that use curr
   window.curr=curr;
 
   renderKPIs(curr,prev,ALL_DATA);
@@ -976,9 +897,9 @@ window.addEventListener('load',async()=>{
   }catch(err){
     document.getElementById('loader-status').textContent='';
     const e=document.getElementById('loader');
-    e.innerHTML+=`<div style="margin-top:20px;color:var(--red);font-size:12px;max-width:380px;text-align:center;line-height:1.6;">
+    e.innerHTML+=`<div style="margin-top:20px;color:#FF4757;font-size:12px;max-width:380px;text-align:center;line-height:1.6;">
       <strong>Failed to load data.</strong><br>${err.message}<br><br>
-      <button onclick="location.reload()" style="background:var(--tp);color:#fff;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700;font-family:var(--font);">Retry</button>
+      <button onclick="location.reload()" style="background:var(--tp);color:#000;border:none;border-radius:8px;padding:8px 20px;cursor:pointer;font-weight:700;font-family:var(--font);">Retry</button>
     </div>`;
   }
 });
