@@ -471,37 +471,6 @@ async function fetchData(){
   return processCSV(parseCSV(csv));
 }
 
-  }
-  window._OVERALL_RATING = overallRating;
-
-  return rows.map(r=>{
-    const dateStr = r['Date']||'';
-    const d = new Date(dateStr);
-    const mKey = !isNaN(d.getTime()) ? `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}` : null;
-    const responseStr = r['Response time']||'';
-    const rd = new Date(responseStr);
-    const respHours = (!isNaN(d.getTime())&&!isNaN(rd.getTime())) ? (rd-d)/3600000 : null;
-    return {
-      link:         r['Link'],
-      brand:        r['Brand']||'IQ Option',
-      type:         r['Type']||'Review',
-      dateRaw:      dateStr,
-      monthKey:     mKey,
-      stars:        parseInt(r['Updated Rating']||r['Original Rating'])||0,
-      content:      (r['Updated content']||r['Original content']||'').replace(/\n/g,' ').trim(),
-      topic:        r['Topic']||'general',
-      language:     (r['Language']||'en').toLowerCase(),
-      sentiment:    r['Sentiment']||'Neutral',
-      fixed:        (r['Fixed']||'').toLowerCase()==='fixed',
-      responseTime: respHours,
-      countForScore:(r['Count for score?']||'').toLowerCase()==='true',
-      source:       r['Source']||'Organic',
-      likes:        parseInt(r['Likes'])||0,
-    };
-  }).filter(r=>r.monthKey);
-}
-
-
 function processCSV(rows){
   // Extract the overall Trustpilot rating (first non-empty value in 'Overall rating' column)
   let overallRating = null;
