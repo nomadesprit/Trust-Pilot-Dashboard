@@ -330,11 +330,57 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
 }
 .count-chip-dot { width:6px; height:6px; background:var(--tp); border-radius:50%; }
 
+/* ── FORECAST ────────────────────────────────────────────── */
+.forecast-grid { display:grid; grid-template-columns:1fr 1fr 1.6fr; gap:12px; }
+.forecast-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:22px 24px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.forecast-card-accent { position:absolute; top:0; left:0; right:0; height:3px; }
+.forecast-label { font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:var(--text3); margin-bottom:10px; }
+.forecast-value { font-family:var(--display); font-size:36px; font-weight:800; line-height:1; letter-spacing:-1.5px; margin-bottom:6px; }
+.forecast-sub { font-size:11px; color:var(--text3); font-family:var(--mono); }
+.forecast-direction {
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:11px; font-weight:700; padding:3px 10px; border-radius:20px;
+  font-family:var(--mono); margin-top:8px;
+}
+.forecast-methodology {
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--border);
+  font-size:10px; color:var(--text3); font-family:var(--mono); line-height:1.6;
+}
+/* Star breakdown forecast bars */
+.forecast-star-rows { display:flex; flex-direction:column; gap:7px; margin-top:4px; }
+.forecast-star-row { display:flex; align-items:center; gap:10px; }
+.forecast-star-lbl { font-size:10px; font-family:var(--mono); width:38px; flex-shrink:0; font-weight:600; }
+.forecast-bar-wrap { flex:1; display:flex; gap:4px; align-items:center; }
+.forecast-bar-track { flex:1; background:var(--surface3); border-radius:3px; height:7px; position:relative; overflow:visible; }
+.forecast-bar-curr { height:100%; border-radius:3px; transition:width .6s ease; }
+.forecast-bar-proj { position:absolute; top:-3px; bottom:-3px; border-radius:3px; opacity:0.35; transition:width .6s ease; }
+.forecast-star-vals { font-size:10px; font-family:var(--mono); color:var(--text3); width:80px; text-align:right; flex-shrink:0; }
+.forecast-legend { display:flex; gap:14px; margin-bottom:12px; }
+.forecast-legend-item { display:flex; align-items:center; gap:5px; font-size:10px; color:var(--text3); font-family:var(--mono); }
+.forecast-legend-dot { width:10px; height:4px; border-radius:2px; }
+/* Confidence badge */
+.confidence-badge {
+  display:inline-flex; align-items:center; gap:6px;
+  background:var(--surface2); border:1px solid var(--border2);
+  border-radius:6px; padding:5px 12px; margin-top:10px;
+  font-size:10px; font-family:var(--mono); color:var(--text3);
+}
+.confidence-badge strong { color:var(--text); }
+.forecast-disclaimer {
+  margin-top:16px; padding:10px 14px; background:var(--surface2);
+  border-radius:8px; border-left:3px solid var(--border2);
+  font-size:10px; color:var(--text3); font-family:var(--mono); line-height:1.6;
+}
+
 @media(max-width:900px){
   .kpi-grid { grid-template-columns:1fr 1fr; }
   .kpi-score { grid-column:span 2; }
   .kpi-global { grid-column:span 2; flex-wrap:wrap; gap:16px; }
   .kpi-global-divider { display:none; }
+  .forecast-grid { grid-template-columns:1fr; }
   .container { padding:16px 16px 60px; }
 }
 </style>
@@ -397,6 +443,10 @@ body { font-family:var(--font); background:var(--bg); color:var(--text); font-si
       <table class="matrix-table" id="topic-matrix"></table>
     </div>
   </div>
+
+  <!-- Rating Forecast -->
+  <div class="section-hd"><div class="section-label">Rating Forecast</div></div>
+  <div id="forecast-section"></div>
 
   <!-- Language Breakdown -->
   <div class="section-hd"><div class="section-label">Language Distribution</div></div>
@@ -473,14 +523,32 @@ async function fetchData(){
   return processCSV(parseCSV(csv));
 }
 
+// Global platform snapshot — extracted from whichever row has the aggregate columns
+let PLATFORM_SNAPSHOT = null;
+
 function processCSV(rows){
-  return rows.map(r=>{
+  PLATFORM_SNAPSHOT = null; // reset on each fetch
+  const parsed = rows.map(r=>{
     const dateStr=r['Date']||'';
     const d=new Date(dateStr);
     const mKey=!isNaN(d.getTime())?`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`:null;
     const responseStr=r['Response time']||'';
     const rd=new Date(responseStr);
     const respHours=(!isNaN(d.getTime())&&!isNaN(rd.getTime()))?(rd-d)/3600000:null;
+    const totalReviews=parseInt(r['Total reviews'])||0;
+    if(totalReviews>0 && !PLATFORM_SNAPSHOT){
+      PLATFORM_SNAPSHOT={
+        totalReviews,
+        star1:parseInt(r['Total 1 Star'])||0,
+        star2:parseInt(r['Total 2 Star'])||0,
+        star3:parseInt(r['Total 3 Star'])||0,
+        star4:parseInt(r['Total 4 Star'])||0,
+        star5:parseInt(r['Total 5 Star'])||0,
+        totalCounting:parseInt(r['Total counting towards trustscore'])||0,
+        overallRating:parseFloat(r['Overall rating'])||null,
+        snapshotDate:dateStr,
+      };
+    }
     return {
       link:r['Link'], brand:r['Brand']||'IQ Option', type:r['Type']||'Review',
       dateRaw:dateStr, monthKey:mKey, stars:parseInt(r['Updated Rating']||r['Original Rating'])||0,
@@ -488,10 +556,12 @@ function processCSV(rows){
       topic:r['Topic']||'general', language:(r['Language']||'en').toLowerCase(),
       sentiment:r['Sentiment']||'Neutral', fixed:(r['Fixed']||'').toLowerCase()==='fixed',
       responseTime:respHours, countForScore:(r['Count for score?']||'').toLowerCase()==='true',
+      isDeleted:(r['is deleted?']||'').toLowerCase()==='true',
       source:r['Source']||'Organic', likes:parseInt(r['Likes'])||0,
       overallRating:parseFloat(r['Overall rating'])||null,
     };
   }).filter(r=>r.monthKey);
+  return parsed;
 }
 
 function getMonthData(data,mk){ return mk==='all'?data:data.filter(r=>r.monthKey===mk); }
@@ -583,17 +653,18 @@ function makeTrendChart(id, curr, mk){
 }
 
 function renderKPIs(curr, prev, allData, globalRating){
-  const scoreR=curr.filter(r=>r.countForScore);
+  const scoreR=curr.filter(r=>r.countForScore&&!r.isDeleted);
   const avgScore=scoreR.length?(scoreR.reduce((s,r)=>s+r.stars,0)/scoreR.length):0;
-  const prevScoreR=prev?prev.filter(r=>r.countForScore):[];
+  const prevScoreR=prev?prev.filter(r=>r.countForScore&&!r.isDeleted):[];
   const prevAvg=prevScoreR.length?(prevScoreR.reduce((s,r)=>s+r.stars,0)/prevScoreR.length):null;
-  const total=curr.length, prevTotal=prev?prev.length:null;
-  const pos=curr.filter(r=>r.sentiment==='Positive').length;
-  const neg=curr.filter(r=>r.sentiment==='Negative').length;
-  const mix=curr.filter(r=>r.sentiment==='Mixed').length;
-  const replied=curr.filter(r=>r.fixed).length;
+  const active=curr.filter(r=>!r.isDeleted);
+  const total=active.length, prevTotal=prev?prev.filter(r=>!r.isDeleted).length:null;
+  const pos=active.filter(r=>r.sentiment==='Positive').length;
+  const neg=active.filter(r=>r.sentiment==='Negative').length;
+  const mix=active.filter(r=>r.sentiment==='Mixed').length;
+  const replied=active.filter(r=>r.fixed).length;
   const replyRate=total>0?((replied/total)*100).toFixed(0):0;
-  const withResp=curr.filter(r=>r.responseTime!==null&&r.responseTime>=0);
+  const withResp=active.filter(r=>r.responseTime!==null&&r.responseTime>=0);
   const withRespCount=withResp.length;
   const avgResp=withRespCount?(withResp.reduce((s,r)=>s+r.responseTime,0)/withRespCount):null;
   const sortedResp=[...withResp.map(r=>r.responseTime)].sort((a,b)=>a-b);
@@ -854,6 +925,185 @@ function reviewCardHtml(r){
   </div>`;
 }
 
+
+// ═══════════════════════════════════════════════════════════
+//  FORECAST
+// ═══════════════════════════════════════════════════════════
+function getNextMonthLabel(mk){
+  if(mk==='all') return 'Next Period';
+  const [y,m]=mk.split('-').map(Number);
+  const nm=m===12?1:m+1, ny=m===12?y+1:y;
+  return MONTH_NAMES[nm-1]+' '+ny;
+}
+
+function renderForecast(allData, mk){
+  const el=document.getElementById('forecast-section');
+  if(!el) return;
+
+  // Only use non-deleted, count-for-score reviews
+  const eligible = allData.filter(r=>!r.isDeleted && r.countForScore && r.stars>0);
+
+  // Get the 3 most recent complete months (exclude current partial month)
+  const monthCounts={};
+  eligible.forEach(r=>{ monthCounts[r.monthKey]=(monthCounts[r.monthKey]||0)+1; });
+  const sortedMonths=Object.keys(monthCounts).sort();
+  // Use all available months for trend (up to 6)
+  const recentMonths=sortedMonths.slice(-6);
+
+  if(recentMonths.length<1){
+    el.innerHTML=`<div class="forecast-disclaimer">Not enough data to generate a forecast.</div>`;
+    return;
+  }
+
+  // Per-month weighted score
+  const monthlyScores=recentMonths.map(m=>{
+    const revs=eligible.filter(r=>r.monthKey===m);
+    const avg=revs.reduce((s,r)=>s+r.stars,0)/revs.length;
+    return {month:m, avg, count:revs.length};
+  });
+
+  // Weighted linear trend (recent months weighted more)
+  const n=monthlyScores.length;
+  let sumW=0, sumWX=0, sumWY=0, sumWXX=0, sumWXY=0;
+  monthlyScores.forEach((ms,i)=>{
+    const w=i+1; // weight = position (most recent = highest)
+    sumW+=w; sumWX+=w*i; sumWY+=w*ms.avg; sumWXX+=w*i*i; sumWXY+=w*i*ms.avg;
+  });
+  const denom=(sumW*sumWXX - sumWX*sumWX);
+  let slope=0, intercept=monthlyScores[n-1].avg;
+  if(Math.abs(denom)>0.0001){
+    slope=(sumW*sumWXY - sumWX*sumWY)/denom;
+    intercept=(sumWY - slope*sumWX)/sumW;
+  }
+  const projectedAvg = Math.min(5, Math.max(1, intercept + slope*n));
+
+  // If we have the platform snapshot, use it as the base for a volume-weighted projection
+  // Simulate adding next month's expected reviews (avg of last 2 months volume)
+  let projectedGlobal = null;
+  let projectedGlobalLabel = '—';
+  const snap = PLATFORM_SNAPSHOT;
+  if(snap && snap.totalCounting>0){
+    // Estimate next month's incoming review count (avg of last 2 available months)
+    const lastTwo = monthlyScores.slice(-2);
+    const expectedNewReviews = Math.round(lastTwo.reduce((s,m)=>s+m.count,0)/lastTwo.length);
+    // Project star distribution of incoming reviews based on recent trend
+    // Use recent 2-month star distribution
+    const recentRevs = eligible.filter(r=>lastTwo.map(x=>x.month).includes(r.monthKey));
+    const recentTotal = recentRevs.length || 1;
+    const recentStarShare = [1,2,3,4,5].map(s=>recentRevs.filter(r=>r.stars===s).length/recentTotal);
+    // New reviews added to snapshot
+    const newStarCounts = recentStarShare.map(sh=>Math.round(sh*expectedNewReviews));
+    const newWeightedSum = newStarCounts.reduce((s,cnt,i)=>s+cnt*(i+1),0);
+    const newTotal = newStarCounts.reduce((a,b)=>a+b,0)||1;
+    // Combine with existing platform totals
+    const combinedWeighted = (snap.star1*1 + snap.star2*2 + snap.star3*3 + snap.star4*4 + snap.star5*5) + newWeightedSum;
+    const combinedTotal = snap.totalCounting + newTotal;
+    projectedGlobal = Math.min(5, Math.max(1, combinedWeighted/combinedTotal));
+    projectedGlobalLabel = projectedGlobal.toFixed(2);
+  }
+
+  const currentAvg = monthlyScores[n-1].avg;
+  const diff = projectedAvg - currentAvg;
+  const diffSign = diff>0.005?'▲':diff<-0.005?'▼':'→';
+  const diffColor = diff>0.005?'var(--tp)':diff<-0.005?'var(--red)':'var(--text3)';
+  const diffClass = diff>0.005?'delta-up':diff<-0.005?'delta-dn':'delta-nt';
+
+  const globalDiff = projectedGlobal!==null?(projectedGlobal-(snap.overallRating||0)):null;
+  const globalDiffSign = globalDiff===null?'→':globalDiff>0.005?'▲':globalDiff<-0.005?'▼':'→';
+  const globalDiffColor = globalDiff===null?'var(--text3)':globalDiff>0.005?'var(--tp)':globalDiff<-0.005?'var(--red)':'var(--text3)';
+
+  const nextMonthName = getNextMonthLabel(mk==='all'?recentMonths[recentMonths.length-1]:mk);
+
+  // Star distribution comparison (current snapshot vs projected)
+  const starBarHtml = snap ? (()=>{
+    const curr5=[snap.star1,snap.star2,snap.star3,snap.star4,snap.star5];
+    const lastRevs=eligible.filter(r=>r.monthKey===recentMonths[recentMonths.length-1]);
+    const lastTotal=lastRevs.length||1;
+    const lastTwo2=monthlyScores.slice(-2);
+    const recentRevs2=eligible.filter(r=>lastTwo2.map(x=>x.month).includes(r.monthKey));
+    const rTotal=recentRevs2.length||1;
+    const expectedNew=Math.round(lastTwo2.reduce((s,m)=>s+m.count,0)/lastTwo2.length);
+    const proj5=[1,2,3,4,5].map((s,i)=>{
+      const sh=recentRevs2.filter(r=>r.stars===s).length/rTotal;
+      return curr5[i]+Math.round(sh*expectedNew);
+    });
+    const maxVal=Math.max(...curr5,...proj5,1);
+    const starColors=['#DC2626','#F97316','#D97706','#16A34A','#008A5C'];
+    return `
+      <div class="forecast-legend">
+        <div class="forecast-legend-item"><div class="forecast-legend-dot" style="background:var(--text3);opacity:.5"></div>Current</div>
+        <div class="forecast-legend-item"><div class="forecast-legend-dot" style="background:var(--tp)"></div>Projected (next month)</div>
+      </div>
+      <div class="forecast-star-rows">
+        ${[5,4,3,2,1].map(s=>{
+          const i=s-1;
+          const cw=(curr5[i]/maxVal*100).toFixed(1);
+          const pw=(proj5[i]/maxVal*100).toFixed(1);
+          return `<div class="forecast-star-row">
+            <span class="forecast-star-lbl" style="color:${starColors[i]}">★ ${s}</span>
+            <div class="forecast-bar-wrap">
+              <div class="forecast-bar-track">
+                <div class="forecast-bar-curr" style="width:${cw}%;background:${starColors[i]};opacity:0.45"></div>
+                <div class="forecast-bar-proj" style="width:${pw}%;background:${starColors[i]}"></div>
+              </div>
+            </div>
+            <span class="forecast-star-vals">${curr5[i].toLocaleString()} → ${proj5[i].toLocaleString()}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+  })() : '<div class="forecast-sub">Platform snapshot not available</div>';
+
+  // Confidence: based on how many months of data and consistency of trend
+  const variance = monthlyScores.reduce((s,m)=>s+Math.pow(m.avg-currentAvg,2),0)/n;
+  const stdDev = Math.sqrt(variance);
+  const confidence = stdDev<0.3&&n>=3?'High':stdDev<0.6||n>=2?'Medium':'Low';
+  const confColor = confidence==='High'?'var(--tp)':confidence==='Medium'?'var(--amber)':'var(--red)';
+
+  el.innerHTML=`
+    <div class="forecast-grid">
+
+      <!-- Card 1: Projected monthly score -->
+      <div class="forecast-card">
+        <div class="forecast-card-accent" style="background:${diffColor}"></div>
+        <div class="forecast-label">Projected Score — ${nextMonthName}</div>
+        <div class="forecast-value" style="color:${diffColor}">${projectedAvg.toFixed(2)}</div>
+        <div class="forecast-sub">Based on ${n} month${n!==1?'s':''} of trend data</div>
+        <div class="forecast-direction ${diffClass}">${diffSign} ${Math.abs(diff).toFixed(2)} vs current month avg</div>
+        <div class="confidence-badge">
+          Confidence: <strong style="color:${confColor}">${confidence}</strong>
+          &nbsp;·&nbsp; σ = ${stdDev.toFixed(2)}
+        </div>
+        <div class="forecast-methodology">
+          Weighted linear regression on ${n} months · recent months weighted higher ·
+          excludes deleted &amp; non-scoring reviews
+        </div>
+      </div>
+
+      <!-- Card 2: Projected global Trustpilot rating -->
+      <div class="forecast-card">
+        <div class="forecast-card-accent" style="background:${globalDiffColor}"></div>
+        <div class="forecast-label">Projected Global Rating — ${nextMonthName}</div>
+        <div class="forecast-value" style="color:${globalDiffColor}">${projectedGlobalLabel}</div>
+        ${snap?`<div class="forecast-sub">Currently ${(snap.overallRating||0).toFixed(1)} · ${snap.totalCounting.toLocaleString()} reviews counting</div>`:'<div class="forecast-sub">Platform snapshot required</div>'}
+        ${globalDiff!==null?`<div class="forecast-direction ${globalDiff>0.005?'delta-up':globalDiff<-0.005?'delta-dn':'delta-nt'}">${globalDiffSign} ${Math.abs(globalDiff).toFixed(3)} vs today</div>`:''}
+        <div class="forecast-methodology">
+          Simulates adding ~${snap?Math.round(monthlyScores.slice(-2).reduce((s,m)=>s+m.count,0)/Math.min(2,monthlyScores.length)):0} new reviews at recent star distribution to the full ${snap?snap.totalCounting.toLocaleString():'—'}-review base
+        </div>
+      </div>
+
+      <!-- Card 3: Star distribution breakdown -->
+      <div class="forecast-card">
+        <div class="forecast-card-accent" style="background:var(--blue)"></div>
+        <div class="forecast-label">Star Distribution — Current vs Projected</div>
+        ${starBarHtml}
+        <div class="forecast-disclaimer" style="margin-top:12px;">
+          Projection assumes next month's incoming volume and star mix mirrors the last 2 months. Deleted reviews are excluded from all calculations.
+        </div>
+      </div>
+
+    </div>`;
+}
+
 function closeModal(){ document.getElementById('overlay').classList.remove('open'); }
 
 let _currData = [];
@@ -873,6 +1123,7 @@ function updateDashboard(){
   renderTopicBars(curr);
   renderMatrix(curr);
   renderLangPills(curr);
+  renderForecast(ALL_DATA, mk);
   document.getElementById('data-badge').textContent=`${curr.length} reviews · ${mk==='all'?'All time':monthLabel(mk)}`;
 }
 
